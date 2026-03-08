@@ -8,6 +8,8 @@
     { "source": "/api/health/(.*)", "destination": "/api/health.js" },
     { "source": "/api/auth", "destination": "/api/auth/index.js" },
     { "source": "/api/auth/(.*)", "destination": "/api/auth/index.js" },
+    { "source": "/api/users", "destination": "/api/users.js" },
+    { "source": "/api/users/(.*)", "destination": "/api/users.js" },
     { "source": "/api/courses", "destination": "/api/courses.js" },
     { "source": "/api/courses/(.*)", "destination": "/api/courses.js" },
     { "source": "/api/upload", "destination": "/api/upload.js" },
