@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Courses from './pages/Courses';
@@ -35,6 +36,7 @@ function App() {
             <Route path="/admin/courses/:id/students" element={<CourseStudents />} />
             <Route path="/admin/enrollments" element={<PendingEnrollments />} />
           </Routes>
+          <SpeedInsights />
         </div>
       </Router>
     </AuthProvider>
