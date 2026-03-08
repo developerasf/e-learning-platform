@@ -13,6 +13,7 @@ const AdminCourseForm = () => {
     description: '',
     thumbnail: '',
     price: 0,
+    category: 'default',
     isPublished: false,
     chapters: []
   });
@@ -357,6 +358,18 @@ const AdminCourseForm = () => {
                   onChange={e => setCourse({ ...course, price: Number(e.target.value) })}
                   className="w-full px-4 py-2 border rounded-lg"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Category</label>
+                <select
+                  value={course.category}
+                  onChange={e => setCourse({ ...course, category: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="default">Default</option>
+                  <option value="latest">Latest</option>
+                  <option value="popular">Popular</option>
+                </select>
               </div>
             </div>
           </div>

@@ -2,8 +2,31 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { protect, admin } from '../middleware/auth.js';
 import connectDB from '../lib/db.js';
+import rateLimit from 'express-rate-limit';
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  keyGenerator: (req) => {
+    return req.ip || req.connection.remoteAddress || 'unknown';
+  },
+  message: { message: 'Too many attempts, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => {
+    return req.ip || req.connection.remoteAddress || 'unknown';
+  },
+  message: { message: 'Too many OTP requests, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 const generateToken = (id) => {
   if (!JWT_SECRET) {

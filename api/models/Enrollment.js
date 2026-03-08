@@ -16,6 +16,21 @@ const enrollmentSchema = new mongoose.Schema({
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
   },
+  watchedVideos: [{
+    videoId: String,
+    watchedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  videoRatings: [{
+    videoId: String,
+    rating: Number,
+    ratedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   createdAt: {
     type: Date,
     default: Date.now

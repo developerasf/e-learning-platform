@@ -47,12 +47,41 @@ export default async function handler(req, res) {
   const studentsMatch = !isKnownRoute && path && path.match(/^\/([^/]+)\/students$/);
   const studentIdMatch = !isKnownRoute && path && path.match(/^\/([^/]+)\/students\/([^/]+)$/);
 
-  // GET /api/courses - list published courses
+  // GET /api/courses - list published courses with pagination, search, and category filter
   if (method === 'GET' && (path === '/' || path === '' || path === '/courses')) {
-    const courses = await Course.find({ isPublished: true })
+    const { page = 1, limit = 15, search = '', category = '' } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    let query = { isPublished: true };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    if (category && ['default', 'latest', 'popular'].includes(category)) {
+      query.category = category;
+    }
+
+    const courses = await Course.find(query)
       .populate('createdBy', 'name')
-      .sort('-createdAt');
-    return res.json(courses);
+      .skip(skip)
+      .limit(parseInt(limit))
+      .sort(category === 'latest' ? '-createdAt' : '-createdAt');
+
+    const total = await Course.countDocuments(query);
+
+    return res.json({
+      courses,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
   }
 
   // POST /api/courses - create course
@@ -63,17 +92,20 @@ export default async function handler(req, res) {
     const adminError = admin(req, res);
     if (adminError) return adminError;
     
-    const { title, description, thumbnail, price } = req.body;
+    const { title, description, thumbnail, price, category } = req.body;
     
     if (!title || !description) {
       return res.status(400).json({ message: 'Title and description are required' });
     }
+
+    const validCategory = ['default', 'latest', 'popular'].includes(category) ? category : 'default';
     
     const course = await Course.create({
       title,
       description,
       thumbnail: thumbnail || '',
       price: price || 0,
+      category: validCategory,
       createdBy: req.user._id,
       chapters: []
     });
@@ -126,16 +158,39 @@ export default async function handler(req, res) {
     const adminError = admin(req, res);
     if (adminError) return adminError;
     
-    const courses = await Course.find()
+    const { page = 1, limit = 15, search = '' } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    let query = {};
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const courses = await Course.find(query)
       .populate('createdBy', 'name')
+      .skip(skip)
+      .limit(parseInt(limit))
       .sort('-createdAt');
+
+    const total = await Course.countDocuments(query);
     
     const coursesWithEnrollments = courses.map(course => ({
       ...course.toObject(),
       enrolledStudents: course.enrolledStudents ? course.enrolledStudents.length : 0
     }));
     
-    return res.json(coursesWithEnrollments);
+    return res.json({
+      courses: coursesWithEnrollments,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
   }
 
   // GET /api/courses/enrollments/pending
@@ -146,11 +201,27 @@ export default async function handler(req, res) {
     const adminError = admin(req, res);
     if (adminError) return adminError;
     
+    const { page = 1, limit = 15 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
     const enrollments = await Enrollment.find({ status: 'pending' })
       .populate('student', 'name email')
       .populate('course', 'title')
+      .skip(skip)
+      .limit(parseInt(limit))
       .sort('-createdAt');
-    return res.json(enrollments);
+
+    const total = await Enrollment.countDocuments({ status: 'pending' });
+
+    return res.json({
+      enrollments,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
   }
 
   // GET /api/courses/:id/enrollment-status
@@ -176,6 +247,11 @@ export default async function handler(req, res) {
     const courseId = enrollMatch[1];
     const authError = await protect(req, res);
     if (authError) return authError;
+    
+    const user = await User.findById(req.user._id);
+    if (!user.isVerified) {
+      return res.status(403).json({ message: 'Please verify your email before enrolling' });
+    }
     
     const course = await Course.findById(courseId);
     if (!course) {
@@ -289,7 +365,7 @@ export default async function handler(req, res) {
       const adminError = admin(req, res);
       if (adminError) return adminError;
       
-      const { title, description, thumbnail, price, isPublished } = req.body;
+      const { title, description, thumbnail, price, isPublished, category } = req.body;
       
       const course = await Course.findById(courseId);
       
@@ -302,6 +378,9 @@ export default async function handler(req, res) {
       course.thumbnail = thumbnail || course.thumbnail;
       course.price = price || course.price;
       course.isPublished = isPublished !== undefined ? isPublished : course.isPublished;
+      if (category && ['default', 'latest', 'popular'].includes(category)) {
+        course.category = category;
+      }
       
       await course.save();
       return res.json(course);
@@ -659,6 +738,212 @@ export default async function handler(req, res) {
     }
     
     return res.json({ message: `Enrollment ${action}d` });
+  }
+
+  // PUT /api/courses/:id/progress - mark video as watched
+  const progressMatch = path && path.match(/^\/([^/]+)\/progress$/);
+  if (method === 'PUT' && progressMatch) {
+    const courseId = progressMatch[1];
+    const authError = await protect(req, res);
+    if (authError) return authError;
+
+    const { videoId } = req.body;
+    if (!videoId) {
+      return res.status(400).json({ message: 'Video ID is required' });
+    }
+
+    const enrollment = await Enrollment.findOne({
+      student: req.user._id,
+      course: courseId,
+      status: 'approved'
+    });
+
+    if (!enrollment) {
+      return res.status(404).json({ message: 'Enrollment not found or not approved' });
+    }
+
+    const alreadyWatched = enrollment.watchedVideos.some(w => w.videoId === videoId);
+    if (!alreadyWatched) {
+      enrollment.watchedVideos.push({
+        videoId,
+        watchedAt: new Date()
+      });
+      await enrollment.save();
+    }
+
+    return res.json({ message: 'Video marked as watched' });
+  }
+
+  // GET /api/courses/:id/progress - get user progress for course
+  if (method === 'GET' && progressMatch) {
+    const courseId = progressMatch[1];
+    const authError = await protect(req, res);
+    if (authError) return authError;
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const enrollment = await Enrollment.findOne({
+      student: req.user._id,
+      course: courseId,
+      status: 'approved'
+    });
+
+    if (!enrollment) {
+      return res.json({ progress: 0, watchedVideos: [], totalVideos: 0 });
+    }
+
+    const totalVideos = course.chapters.reduce((acc, ch) => acc + ch.videos.length, 0);
+    const progress = totalVideos > 0 ? Math.round((enrollment.watchedVideos.length / totalVideos) * 100) : 0;
+
+    return res.json({
+      progress,
+      watchedVideos: enrollment.watchedVideos,
+      totalVideos
+    });
+  }
+
+  // POST /api/courses/:id/chapters/:chId/videos/:vidId/rate - rate a video
+  const videoRateMatch = path && path.match(/^\/([^/]+)\/chapters\/([^/]+)\/videos\/([^/]+)\/rate$/);
+  if (method === 'POST' && videoRateMatch) {
+    const courseId = videoRateMatch[1];
+    const chapterId = videoRateMatch[2];
+    const videoId = videoRateMatch[3];
+    const authError = await protect(req, res);
+    if (authError) return authError;
+
+    const { rating } = req.body;
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const chapter = course.chapters.id(chapterId);
+    if (!chapter) {
+      return res.status(404).json({ message: 'Chapter not found' });
+    }
+
+    const video = chapter.videos.id(videoId);
+    if (!video) {
+      return res.status(404).json({ message: 'Video not found' });
+    }
+
+    const enrollment = await Enrollment.findOne({
+      student: req.user._id,
+      course: courseId,
+      status: 'approved'
+    });
+
+    if (!enrollment) {
+      return res.status(403).json({ message: 'Not enrolled in this course' });
+    }
+
+    const existingRatingIndex = enrollment.videoRatings.findIndex(r => r.videoId === videoId);
+    if (existingRatingIndex >= 0) {
+      enrollment.videoRatings[existingRatingIndex].rating = rating;
+      enrollment.videoRatings[existingRatingIndex].ratedAt = new Date();
+    } else {
+      enrollment.videoRatings.push({
+        videoId,
+        rating,
+        ratedAt: new Date()
+      });
+    }
+
+    await enrollment.save();
+    return res.json({ message: 'Rating submitted' });
+  }
+
+  // GET /api/courses/:id/chapters/:chId/videos/:vidId/rating - get video rating
+  if (method === 'GET' && videoRateMatch) {
+    const courseId = videoRateMatch[1];
+    const videoId = videoRateMatch[3];
+    const authError = await protect(req, res);
+    if (authError) return authError;
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const enrollments = await Enrollment.find({
+      course: courseId,
+      status: 'approved'
+    });
+
+    const ratings = enrollments
+      .flatMap(e => e.videoRatings)
+      .filter(r => r.videoId === videoId);
+
+    const avgRating = ratings.length > 0
+      ? (ratings.reduce((acc, r) => acc + r.rating, 0) / ratings.length).toFixed(1)
+      : 0;
+
+    return res.json({
+      videoId,
+      averageRating: parseFloat(avgRating),
+      totalRatings: ratings.length,
+      ratings: ratings.map(r => ({
+        rating: r.rating,
+        ratedAt: r.ratedAt
+      }))
+    });
+  }
+
+  // GET /api/courses/:id/ratings - get all video ratings for a course (admin)
+  const courseRatingsMatch = path && path.match(/^\/([^/]+)\/ratings$/);
+  if (method === 'GET' && courseRatingsMatch) {
+    const courseId = courseRatingsMatch[1];
+    const authError = await protect(req, res);
+    if (authError) return authError;
+
+    const adminError = admin(req, res);
+    if (adminError) return adminError;
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    const enrollments = await Enrollment.find({
+      course: courseId,
+      status: 'approved'
+    });
+
+    const videoStats = {};
+
+    course.chapters.forEach(ch => {
+      ch.videos.forEach(v => {
+        const videoId = v._id.toString();
+        const videoRatings = enrollments
+          .flatMap(e => e.videoRatings)
+          .filter(r => r.videoId === videoId);
+
+        const avgRating = videoRatings.length > 0
+          ? (videoRatings.reduce((acc, r) => acc + r.rating, 0) / videoRatings.length).toFixed(1)
+          : 0;
+
+        videoStats[videoId] = {
+          videoId,
+          title: v.title,
+          chapterTitle: ch.title,
+          averageRating: parseFloat(avgRating),
+          totalRatings: videoRatings.length,
+          ratings: videoRatings.map(r => ({
+            rating: r.rating,
+            ratedAt: r.ratedAt
+          }))
+        };
+      });
+    });
+
+    return res.json(Object.values(videoStats));
   }
 
   return res.status(404).json({ message: 'Endpoint not found: ' + path });

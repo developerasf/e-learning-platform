@@ -10,6 +10,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 export const config = {
   api: {
     bodyParser: false,
@@ -28,6 +30,11 @@ export default async function handler(req, res) {
 
   // Banner upload
   if (method === 'POST' && (path === '/banner' || path === '/api/banner' || path === '/upload/banner')) {
+    const contentLength = parseInt(req.headers['content-length'] || 0);
+    if (contentLength > MAX_FILE_SIZE) {
+      return res.status(400).json({ message: 'File size exceeds 10MB limit' });
+    }
+    
     return new Promise((resolve) => {
       const bb = busboy({ headers: req.headers });
       let fileBuffer = null;
@@ -109,6 +116,11 @@ export default async function handler(req, res) {
 
   // Thumbnail upload
   if (method === 'POST' && (path === '/thumbnail' || path === '/api/thumbnail' || path === '/upload/thumbnail')) {
+    const contentLength = parseInt(req.headers['content-length'] || 0);
+    if (contentLength > MAX_FILE_SIZE) {
+      return res.status(400).json({ message: 'File size exceeds 10MB limit' });
+    }
+    
     return new Promise((resolve) => {
       const bb = busboy({ headers: req.headers });
       let fileBuffer = null;
@@ -173,6 +185,11 @@ export default async function handler(req, res) {
 
   // Notes/PDF upload
   if (method === 'POST' && (path === '/notes' || path === '/api/notes' || path === '/upload/notes')) {
+    const contentLength = parseInt(req.headers['content-length'] || 0);
+    if (contentLength > MAX_FILE_SIZE) {
+      return res.status(400).json({ message: 'File size exceeds 10MB limit' });
+    }
+    
     return new Promise((resolve) => {
       const bb = busboy({ headers: req.headers });
       let fileBuffer = null;

@@ -62,6 +62,11 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  category: {
+    type: String,
+    enum: ['default', 'latest', 'popular'],
+    default: 'default'
+  },
   isPublished: {
     type: Boolean,
     default: false
