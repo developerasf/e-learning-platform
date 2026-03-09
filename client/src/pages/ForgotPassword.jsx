@@ -86,19 +86,19 @@ const ForgotPassword = () => {
 
   return (
     <div className="max-w-md mx-auto px-4 py-8 sm:py-16">
-      <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
           {step === 1 ? 'Forgot Password' : 'Reset Password'}
         </h2>
         
         {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-sm sm:text-base">
+          <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 text-green-700 dark:text-green-300 px-4 py-3 rounded mb-4 text-sm sm:text-base">
             {success}
           </div>
         )}
         
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm sm:text-base">
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4 text-sm sm:text-base">
             {error}
           </div>
         )}
@@ -106,21 +106,21 @@ const ForgotPassword = () => {
         {step === 1 ? (
           <form onSubmit={handleSendOTP}>
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">Email Address</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 placeholder="yourname@gmail.com"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Enter your email to receive a reset code</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enter your email to receive a reset code</p>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+              className="w-full bg-blue-600 dark:bg-blue-600 text-white py-2 sm:py-3 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
             >
               {loading ? 'Sending...' : 'Send Reset Code'}
             </button>
@@ -128,40 +128,40 @@ const ForgotPassword = () => {
         ) : (
           <form onSubmit={handleReset}>
             <div className="mb-4">
-              <p className="text-gray-600 mb-4 text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base">
                 Enter the code sent to<br />
-                <span className="font-semibold text-blue-600">{email}</span>
+                <span className="font-semibold text-blue-600 dark:text-blue-400">{email}</span>
               </p>
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">Verification Code</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Verification Code</label>
               <input
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-xl tracking-widest font-mono text-sm sm:text-base"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl tracking-widest font-mono text-sm sm:text-base"
                 placeholder="000000"
                 maxLength={6}
                 required
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">New Password</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">New Password</label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 placeholder="Min 6 characters"
                 required
                 minLength={6}
               />
             </div>
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">Confirm Password</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Confirm Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 placeholder="Confirm password"
                 required
                 minLength={6}
@@ -170,18 +170,18 @@ const ForgotPassword = () => {
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+              className="w-full bg-blue-600 dark:bg-blue-600 text-white py-2 sm:py-3 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
             >
               {loading ? 'Resetting...' : 'Reset Password'}
             </button>
             <div className="mt-4 text-center">
               {resendTimer > 0 ? (
-                <p className="text-gray-500 text-sm sm:text-base">Resend code in {resendTimer}s</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Resend code in {resendTimer}s</p>
               ) : (
                 <button
                   type="button"
                   onClick={handleResend}
-                  className="text-blue-600 hover:underline text-sm sm:text-base"
+                  className="text-blue-600 dark:text-blue-400 hover:underline text-sm sm:text-base"
                 >
                   Resend Code
                 </button>
@@ -191,7 +191,7 @@ const ForgotPassword = () => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-gray-600 hover:underline text-sm sm:text-base"
+                className="text-gray-600 dark:text-gray-400 hover:underline text-sm sm:text-base"
               >
                 Change Email
               </button>
@@ -199,9 +199,9 @@ const ForgotPassword = () => {
           </form>
         )}
         
-        <p className="text-center mt-6 text-gray-600 text-sm sm:text-base">
+        <p className="text-center mt-6 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
           Remember your password?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">
+          <Link to="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
             Login
           </Link>
         </p>

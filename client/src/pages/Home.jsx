@@ -8,11 +8,12 @@ const Home = () => {
   useEffect(() => {
     Promise.all([
       fetch('/api/upload/banner').then(r => r.json()),
-      fetch('/api/courses').then(r => r.json())
+      fetch('/api/courses?page=1&limit=6').then(r => r.json())
     ])
       .then(([bannerData, coursesData]) => {
         if (bannerData.url) setBanner(bannerData.url);
-        setCourses(coursesData.slice(0, 6));
+        const courses = coursesData.courses || coursesData;
+        setCourses(courses.slice(0, 6));
       })
       .catch(console.error);
   }, []);
