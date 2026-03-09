@@ -284,7 +284,7 @@ const AdminCourseForm = () => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="text-center text-sm sm:text-base">Loading...</div>
+        <div className="text-center text-gray-700 dark:text-gray-300 text-sm sm:text-base">Loading...</div>
       </div>
     );
   }
@@ -292,7 +292,7 @@ const AdminCourseForm = () => {
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-6 mb-5 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
           {id ? 'Edit Course' : 'Create New Course'}
         </h1>
         <button
@@ -306,44 +306,44 @@ const AdminCourseForm = () => {
 
       <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
         <div className="md:col-span-2 space-y-4 sm:space-y-6">
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Course Details</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Course Details</h2>
             <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Title</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Title</label>
                 <input
                   type="text"
                   value={course.title}
                   onChange={e => setCourse({ ...course, title: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Course title"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Description</label>
                 <textarea
                   value={course.description}
                   onChange={e => setCourse({ ...course, description: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg h-24"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white h-24"
                   placeholder="Course description"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Thumbnail Image</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Thumbnail Image</label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleThumbnailUpload}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
-                {uploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
+                {uploading && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Uploading...</p>}
                 {course.thumbnail && (
                   <div className="mt-2">
                     <img src={course.thumbnail} alt="Thumbnail" className="h-20 w-auto rounded" />
                     <button
                       type="button"
                       onClick={() => setCourse({ ...course, thumbnail: '' })}
-                      className="text-red-600 text-sm mt-1"
+                      className="text-red-600 text-sm mt-1 block"
                     >
                       Remove
                     </button>
@@ -351,20 +351,20 @@ const AdminCourseForm = () => {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Price (BDT)</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Price (BDT)</label>
                 <input
                   type="number"
                   value={course.price}
                   onChange={e => setCourse({ ...course, price: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Category</label>
                 <select
                   value={course.category}
                   onChange={e => setCourse({ ...course, category: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="default">Default</option>
                   <option value="latest">Latest</option>
@@ -374,15 +374,15 @@ const AdminCourseForm = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold mb-4">Chapters</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Chapters</h2>
             <div className="flex gap-2 mb-4">
               <input
                 type="text"
                 value={newChapter}
                 onChange={e => setNewChapter(e.target.value)}
                 placeholder="Chapter title"
-                className="flex-1 px-4 py-2 border rounded-lg"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
               <button
                 onClick={handleAddChapter}
@@ -393,31 +393,31 @@ const AdminCourseForm = () => {
               </button>
             </div>
             {!id && (
-              <p className="text-sm text-gray-500 mb-4">Save course first before adding chapters.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Save course first before adding chapters.</p>
             )}
             <div className="space-y-4">
               {course.chapters?.map((chapter, index) => (
-                <div key={chapter._id} className="border rounded-lg p-4">
+                <div key={chapter._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
-                    <h3 className="font-medium text-sm sm:text-base">
+                    <h3 className="font-medium text-sm sm:text-base text-gray-900 dark:text-white">
                       Chapter: {chapter.title}
                     </h3>
                     <div className="flex gap-2 flex-wrap">
                       <button
                         onClick={() => setShowNotesForm(showNotesForm === chapter._id ? '' : chapter._id)}
-                        className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-green-200 transition"
+                        className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-green-200 dark:hover:bg-green-900/50 transition"
                       >
                         + Add Notes
                       </button>
                       <button
                         onClick={() => setShowVideoForm(chapter._id)}
-                        className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-200 transition"
+                        className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-900/50 transition"
                       >
                         + Add Video
                       </button>
                       <button
                         onClick={() => handleDeleteChapter(chapter._id)}
-                        className="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-200 transition"
+                        className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition"
                       >
                         Delete
                       </button>
@@ -426,15 +426,15 @@ const AdminCourseForm = () => {
 
                   {/* Show existing notes */}
                   {chapter.notes && chapter.notes.length > 0 && (
-                    <div className="mb-3 p-3 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-medium text-gray-500 mb-2">Uploaded Notes:</p>
+                    <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Uploaded Notes:</p>
                       <div className="space-y-2">
                         {chapter.notes.map((note, noteIndex) => (
-                          <div key={noteIndex} className="flex justify-between items-center bg-white p-2 rounded border">
-                            <span className="text-sm text-gray-700 truncate flex-1 mr-2">{note.title || 'Notes ' + (noteIndex + 1)}</span>
+                          <div key={noteIndex} className="flex justify-between items-center bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-600">
+                            <span className="text-sm text-gray-700 dark:text-gray-300 truncate flex-1 mr-2">{note.title || 'Notes ' + (noteIndex + 1)}</span>
                             <button
                               onClick={() => handleDeleteSingleNote(chapter._id, note._id)}
-                              className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium hover:bg-red-200"
+                              className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs font-medium hover:bg-red-200 dark:hover:bg-red-900/50"
                             >
                               Delete
                             </button>
@@ -447,44 +447,44 @@ const AdminCourseForm = () => {
                   {showNotesForm === chapter._id && (
                     <div className="bg-green-50 p-4 rounded-lg mb-3 border border-green-200">
                       <div className="mb-3">
-                        <label className="block text-xs text-gray-600 mb-1">Notes Title</label>
+                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Notes Title</label>
                         <input
                           type="text"
                           placeholder="e.g., Lecture Notes, Summary, Exercise"
                           value={newNoteTitle[chapter._id] || ''}
                           onChange={(e) => setNewNoteTitle({ ...newNoteTitle, [chapter._id]: e.target.value })}
-                          className="w-full px-3 py-2 border rounded-lg text-sm"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-600 mb-1">Upload PDF</label>
+                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Upload PDF</label>
                         <input
                           type="file"
                           accept="application/pdf"
                           onChange={(e) => handleUploadNotes(chapter._id, e.target.files[0])}
                           disabled={notesUploading}
-                          className="w-full text-sm"
+                          className="w-full text-sm text-gray-700 dark:text-gray-300"
                         />
                       </div>
-                      {notesUploading && <p className="text-xs text-gray-500 mt-2">Uploading...</p>}
+                      {notesUploading && <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Uploading...</p>}
                     </div>
                   )}
 
                   {showVideoForm === chapter._id && (
-                    <div className="bg-gray-50 p-3 rounded mb-3">
+                    <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded mb-3">
                       <input
                         type="text"
                         placeholder="Video title"
                         value={newVideo.title}
                         onChange={e => setNewVideo({ ...newVideo, title: e.target.value, chapterId: chapter._id })}
-                        className="w-full px-3 py-2 border rounded mb-2"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                       <input
                         type="text"
                         placeholder="YouTube URL (e.g., https://youtu.be/xxx)"
                         value={newVideo.youtubeUrl}
                         onChange={e => setNewVideo({ ...newVideo, youtubeUrl: e.target.value, chapterId: chapter._id })}
-                        className="w-full px-3 py-2 border rounded mb-2"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                       <button
                         onClick={handleAddVideo}
@@ -497,13 +497,13 @@ const AdminCourseForm = () => {
 
                   <div className="space-y-2">
                     {chapter.videos?.map((video, vIndex) => (
-                      <div key={video._id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-                        <span className="text-sm">
+                      <div key={video._id} className="flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
                           {index + 1}.{vIndex + 1} {video.title}
                         </span>
                         <button
                           onClick={() => handleDeleteVideo(chapter._id, video._id)}
-                          className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium hover:bg-red-200"
+                          className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs font-medium hover:bg-red-200 dark:hover:bg-red-900/50"
                         >
                           Delete
                         </button>
@@ -517,18 +517,18 @@ const AdminCourseForm = () => {
         </div>
 
         <div className="md:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
-            <h2 className="text-lg font-semibold mb-4">Preview</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sticky top-4">
+            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Preview</h2>
             {course.thumbnail && (
               <img src={course.thumbnail} alt="Preview" className="w-full h-40 object-cover rounded mb-4" />
             )}
-            <h3 className="font-bold text-xl mb-2">{course.title || 'Course Title'}</h3>
-            <p className="text-gray-600 text-sm mb-2">{course.description || 'Course description...'}</p>
-            <p className="text-blue-600 font-bold">
+            <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">{course.title || 'Course Title'}</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{course.description || 'Course description...'}</p>
+            <p className="text-blue-600 dark:text-blue-400 font-bold">
               {course.price === 0 ? 'Free' : `BDT ${course.price}`}
             </p>
             <div className="mt-4">
-              <span className={`px-2 py-1 text-xs rounded ${course.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+              <span className={`px-2 py-1 text-xs rounded ${course.isPublished ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
                 {course.isPublished ? 'Published' : 'Draft'}
               </span>
             </div>

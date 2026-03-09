@@ -99,7 +99,7 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="text-center text-sm sm:text-base">Loading...</div>
+        <div className="text-center text-gray-700 dark:text-gray-300 text-sm sm:text-base">Loading...</div>
       </div>
     );
   }
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-3xl font-bold">Manage Dashboard</h1>
+        <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">Manage Dashboard</h1>
         <div className="flex flex-wrap gap-2 sm:gap-4">
           <Link
             to="/admin/enrollments"
@@ -136,19 +136,19 @@ const AdminDashboard = () => {
       </div>
 
       {/* Banner Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
-        <h2 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4">Home Page Banner</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6 sm:mb-8">
+        <h2 className="text-base sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Home Page Banner</h2>
         <div className="flex flex-col md:flex-row gap-4 sm:gap-6 items-start">
           <div className="w-full md:w-1/3">
-            <label className="block text-sm font-medium mb-2">Upload Banner Image</label>
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Upload Banner Image</label>
             <input
               type="file"
               accept="image/*"
               onChange={handleBannerUpload}
               disabled={bannerUploading}
-              className="w-full px-3 sm:px-4 py-2 border rounded-lg text-sm"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
-            <p className="text-xs text-gray-500 mt-1">Recommended: 1920x500px</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended: 1920x500px</p>
           </div>
           <div className="w-full md:w-2/3">
             {banner ? (
