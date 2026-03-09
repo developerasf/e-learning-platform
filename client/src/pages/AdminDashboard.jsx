@@ -105,7 +105,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">Manage Dashboard</h1>
         <div className="flex flex-wrap gap-2 sm:gap-4">
@@ -171,39 +171,39 @@ const AdminDashboard = () => {
       </div>
 
       {/* Courses Table - Responsive */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
         {/* Desktop Table */}
         <div className="hidden md:block">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chapters</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Students</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Title</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Chapters</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Students</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {courses.map(course => (
                 <tr key={course._id}>
                   <td className="px-4 py-4">
-                    <div className="font-medium text-gray-900 text-sm">{course.title}</div>
-                    <div className="text-xs text-gray-500">{course.description?.slice(0, 40)}...</div>
+                    <div className="font-medium text-gray-900 dark:text-white text-sm">{course.title}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{course.description?.slice(0, 40)}...</div>
                   </td>
-                  <td className="px-4 py-4 text-gray-500 text-sm">
+                  <td className="px-4 py-4 text-gray-500 dark:text-gray-400 text-sm">
                     {course.chapters?.length || 0}
                   </td>
                   <td className="px-4 py-4">
                     <Link
                       to={`/admin/courses/${course._id}/students`}
-                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm"
                     >
                       {course.enrolledStudents}
                     </Link>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`px-2 py-1 text-xs rounded ${course.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    <span className={`px-2 py-1 text-xs rounded ${course.isPublished ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
                       {course.isPublished ? 'Published' : 'Draft'}
                     </span>
                   </td>
@@ -211,19 +211,19 @@ const AdminDashboard = () => {
                     <div className="flex gap-2">
                       <Link
                         to={`/admin/courses/${course._id}/edit`}
-                        className="text-blue-600 hover:text-blue-800 text-sm"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
                       >
                         Edit
                       </Link>
                       <button
                         onClick={() => togglePublish(course._id, course.isPublished)}
-                        className="text-gray-600 hover:text-gray-800 text-sm"
+                        className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 text-sm"
                       >
                         {course.isPublished ? 'Unpublish' : 'Publish'}
                       </button>
                       <button
                         onClick={() => handleDelete(course._id)}
-                        className="text-red-600 hover:text-red-800 text-sm"
+                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm"
                       >
                         Delete
                       </button>
@@ -236,38 +236,38 @@ const AdminDashboard = () => {
         </div>
 
         {/* Mobile Cards */}
-        <div className="md:hidden divide-y divide-gray-200">
+        <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
           {courses.map(course => (
             <div key={course._id} className="p-4">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium text-gray-900 text-sm">{course.title}</h3>
-                <span className={`px-2 py-1 text-xs rounded ${course.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                <h3 className="font-medium text-gray-900 dark:text-white text-sm">{course.title}</h3>
+                <span className={`px-2 py-1 text-xs rounded ${course.isPublished ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
                   {course.isPublished ? 'Published' : 'Draft'}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mb-3">{course.description?.slice(0, 60)}...</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">{course.description?.slice(0, 60)}...</p>
               <div className="flex flex-wrap gap-3 text-xs mb-3">
-                <span className="text-gray-600">{course.chapters?.length || 0} chapters</span>
-                <Link to={`/admin/courses/${course._id}/students`} className="text-blue-600 font-medium">
+                <span className="text-gray-600 dark:text-gray-400">{course.chapters?.length || 0} chapters</span>
+                <Link to={`/admin/courses/${course._id}/students`} className="text-blue-600 dark:text-blue-400 font-medium">
                   {course.enrolledStudents} students
                 </Link>
               </div>
               <div className="flex flex-wrap gap-3">
                 <Link
                   to={`/admin/courses/${course._id}/edit`}
-                  className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs font-medium"
                 >
                   Edit
                 </Link>
                 <button
                   onClick={() => togglePublish(course._id, course.isPublished)}
-                  className="text-gray-600 hover:text-gray-800 text-xs"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 text-xs"
                 >
                   {course.isPublished ? 'Unpublish' : 'Publish'}
                 </button>
                 <button
                   onClick={() => handleDelete(course._id)}
-                  className="text-red-600 hover:text-red-800 text-xs"
+                  className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-xs"
                 >
                   Delete
                 </button>
@@ -275,7 +275,7 @@ const AdminDashboard = () => {
             </div>
           ))}
           {courses.length === 0 && (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
               No courses yet. Create your first course!
             </div>
           )}
