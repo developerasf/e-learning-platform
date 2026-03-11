@@ -230,10 +230,26 @@ export default async function handler(req, res) {
     const authError = await protect(req, res);
     if (authError) return authError;
     
-    const enrollment = await Enrollment.findOne({
+    const user = await User.findById(req.user._id);
+    const course = await Course.findById(courseId);
+    
+    let enrollment = await Enrollment.findOne({
       student: req.user._id,
       course: courseId
     });
+    
+    if (!enrollment && user.role === 'admin') {
+      enrollment = await Enrollment.create({
+        student: req.user._id,
+        course: courseId,
+        status: 'approved'
+      });
+      if (course && !course.enrolledStudents.includes(req.user._id)) {
+        course.enrolledStudents.push(req.user._id);
+        await course.save();
+      }
+      return res.json({ status: 'approved' });
+    }
     
     if (!enrollment) {
       return res.json({ status: 'not_enrolled' });
@@ -267,14 +283,47 @@ export default async function handler(req, res) {
       if (existingEnrollment.status === 'approved') {
         return res.status(400).json({ message: 'Already enrolled' });
       } else if (existingEnrollment.status === 'pending') {
+        if (user.role === 'admin') {
+          existingEnrollment.status = 'approved';
+          await existingEnrollment.save();
+          if (!course.enrolledStudents.includes(req.user._id)) {
+            course.enrolledStudents.push(req.user._id);
+            await course.save();
+          }
+          return res.json({ message: 'Enrolled successfully' });
+        }
         return res.status(400).json({ message: 'Enrollment request already pending' });
       } else if (existingEnrollment.status === 'rejected') {
+        if (user.role === 'admin') {
+          existingEnrollment.status = 'approved';
+          await existingEnrollment.save();
+          if (!course.enrolledStudents.includes(req.user._id)) {
+            course.enrolledStudents.push(req.user._id);
+            await course.save();
+          }
+          return res.json({ message: 'Enrolled successfully' });
+        }
         existingEnrollment.status = 'pending';
         await existingEnrollment.save();
         return res.json({ message: 'Enrollment request submitted' });
       }
     }
     
+    if (user.role === 'admin') {
+      await Enrollment.create({
+        student: req.user._id,
+        course: courseId,
+        status: 'approved'
+      });
+
+      if (!course.enrolledStudents.includes(req.user._id)) {
+        course.enrolledStudents.push(req.user._id);
+        await course.save();
+      }
+      
+      return res.json({ message: 'Enrolled successfully' });
+    }
+
     await Enrollment.create({
       student: req.user._id,
       course: courseId,
@@ -780,16 +829,29 @@ export default async function handler(req, res) {
     const authError = await protect(req, res);
     if (authError) return authError;
 
+    const user = await User.findById(req.user._id);
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
 
-    const enrollment = await Enrollment.findOne({
+    let enrollment = await Enrollment.findOne({
       student: req.user._id,
       course: courseId,
       status: 'approved'
     });
+
+    if (!enrollment && user.role === 'admin') {
+      enrollment = await Enrollment.create({
+        student: req.user._id,
+        course: courseId,
+        status: 'approved'
+      });
+      if (!course.enrolledStudents.includes(req.user._id)) {
+        course.enrolledStudents.push(req.user._id);
+        await course.save();
+      }
+    }
 
     if (!enrollment) {
       return res.json({ progress: 0, watchedVideos: [], totalVideos: 0 });

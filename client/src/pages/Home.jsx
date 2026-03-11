@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 
 const Home = memo(() => {
   const [banner, setBanner] = useState('');
-  const [bannerLoading, setBannerLoading] = useState(true);
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
@@ -16,81 +15,49 @@ const Home = memo(() => {
         const courses = coursesData.courses || coursesData;
         setCourses(courses.slice(0, 6));
       })
-      .catch(console.error)
-      .finally(() => setBannerLoading(false));
+      .catch(console.error);
   }, []);
 
   return (
     <div className="min-h-screen">
       {/* Banner Section */}
-      {(banner || bannerLoading) && (
-        <div className="relative h-56 sm:h-80 md:h-96 w-full overflow-hidden">
-          {bannerLoading ? (
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 animate-pulse" />
-          ) : banner ? (
-            <img 
-              src={banner} 
-              alt="Banner" 
-              className="w-full h-full object-cover"
-              loading="eager"
-              decoding="async"
-            />
-          ) : null}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 flex flex-col items-center justify-center">
-            <div className="text-center text-white px-4 max-w-4xl mb-6">
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg">
-                Welcome to EduSpace
-              </h1>
-              <p className="text-sm sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow">
-                Unlock your potential with expert-led video courses
-              </p>
-            </div>
-            <div className="flex justify-center gap-3 sm:gap-4 flex-wrap px-4">
-              <Link
-                to="/courses"
-                className="bg-violet-500 hover:bg-violet-600 text-white px-5 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-lg font-medium transition-all transform hover:scale-105 shadow-lg"
-              >
-                Browse Courses
-              </Link>
-              <Link
-                to="/register"
-                className="bg-white/10 hover:bg-white/20 text-white px-5 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-lg font-medium transition-all backdrop-blur-sm border border-white/20"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hero Section (only show if no banner) */}
-      {!banner && (
-        <div className="bg-gradient-to-br from-slate-900 via-violet-900 to-slate-800 text-white py-12 sm:py-20">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 tracking-tight">
-              Welcome to <span className="text-violet-400">EduSpace</span>
+      <div className="relative h-56 sm:h-80 md:h-96 w-full overflow-hidden">
+        {banner ? (
+          <img 
+            src={banner} 
+            alt="Banner" 
+            className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 flex flex-col items-center justify-center">
+          <div className="text-center text-white px-4 max-w-4xl mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg">
+              Welcome to EduSpace
             </h1>
-            <p className="text-base sm:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
-              Learn from expert teachers with our comprehensive video courses. 
-              Master new skills at your own pace.
+            <p className="text-sm sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow">
+              Unlock your potential with expert-led video courses
             </p>
-            <div className="flex justify-center gap-3 sm:gap-4 flex-wrap px-4">
-              <Link
-                to="/courses"
-                className="bg-violet-500 hover:bg-violet-600 text-white px-5 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-lg font-medium transition-all transform hover:scale-105 shadow-lg"
-              >
-                Browse Courses
-              </Link>
-              <Link
-                to="/register"
-                className="bg-white/10 hover:bg-white/20 text-white px-5 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-lg font-medium transition-all backdrop-blur-sm border border-white/20"
-              >
-                Get Started
-              </Link>
-            </div>
+          </div>
+          <div className="flex justify-center gap-3 sm:gap-4 flex-wrap px-4">
+            <Link
+              to="/courses"
+              className="bg-violet-500 hover:bg-violet-600 text-white px-5 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-lg font-medium transition-all transform hover:scale-105 shadow-lg"
+            >
+              Browse Courses
+            </Link>
+            <Link
+              to="/register"
+              className="bg-white/10 hover:bg-white/20 text-white px-5 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-lg font-medium transition-all backdrop-blur-sm border border-white/20"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Features Section */}
       <div className="py-10 sm:py-16 bg-gray-50">

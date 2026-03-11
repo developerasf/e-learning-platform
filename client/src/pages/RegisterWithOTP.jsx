@@ -94,12 +94,12 @@ const RegisterWithOTP = memo(() => {
 
   return (
     <div className="max-w-md mx-auto px-4 py-8 sm:py-16">
-      <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
           {step === 1 ? 'Create Account' : 'Verify Email'}
         </h2>
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm sm:text-base">
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4 text-sm sm:text-base">
             {error}
           </div>
         )}
@@ -107,34 +107,34 @@ const RegisterWithOTP = memo(() => {
         {step === 1 ? (
           <form onSubmit={handleSendOTP}>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">Name</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 required
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">Gmail Address</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Gmail Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 placeholder="yourname@gmail.com"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">Only Gmail addresses are allowed</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Only Gmail addresses are allowed</p>
             </div>
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">Password</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 required
                 minLength={6}
               />
@@ -150,16 +150,16 @@ const RegisterWithOTP = memo(() => {
         ) : (
           <form onSubmit={handleVerify}>
             <div className="mb-4">
-              <p className="text-gray-600 mb-4 text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm sm:text-base">
                 We've sent a 6-digit verification code to<br />
-                <span className="font-semibold text-blue-600">{email}</span>
+                <span className="font-semibold text-blue-600 dark:text-blue-400">{email}</span>
               </p>
-              <label className="block text-gray-700 mb-2 text-sm sm:text-base">Verification Code</label>
+              <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Verification Code</label>
               <input
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-xl tracking-widest font-mono text-sm sm:text-base"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl tracking-widest font-mono text-sm sm:text-base"
                 placeholder="000000"
                 maxLength={6}
                 required
@@ -174,12 +174,12 @@ const RegisterWithOTP = memo(() => {
             </button>
             <div className="mt-4 text-center">
               {resendTimer > 0 ? (
-                <p className="text-gray-500 text-sm sm:text-base">Resend code in {resendTimer}s</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Resend code in {resendTimer}s</p>
               ) : (
                 <button
                   type="button"
                   onClick={handleResend}
-                  className="text-blue-600 hover:underline text-sm sm:text-base"
+                  className="text-blue-600 dark:text-blue-400 hover:underline text-sm sm:text-base"
                 >
                   Resend Code
                 </button>
@@ -189,7 +189,7 @@ const RegisterWithOTP = memo(() => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-gray-600 hover:underline text-sm sm:text-base"
+                className="text-gray-600 dark:text-gray-400 hover:underline text-sm sm:text-base"
               >
                 Change Email
               </button>
@@ -197,9 +197,9 @@ const RegisterWithOTP = memo(() => {
           </form>
         )}
         
-        <p className="text-center mt-6 text-gray-600 text-sm sm:text-base">
+        <p className="text-center mt-6 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">
+          <Link to="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
             Login
           </Link>
         </p>

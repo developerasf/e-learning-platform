@@ -199,7 +199,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isEnrolled = (courseId) => {
-    if (!user || !user.enrolledCourses) return false;
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    if (!user.enrolledCourses) return false;
     const courseIdStr = courseId.toString();
     return user.enrolledCourses.some(id => 
       id === courseIdStr || 
