@@ -186,7 +186,7 @@ export default async function handler(req, res) {
           email,
           'Your Verification Code',
           `<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: #4F46E5;">EduSpace Verification</h2>
+            <h2 style="color: #4F46E5;">Bipul's Class Room Verification</h2>
             <p>Your verification code is:</p>
             <h1 style="color: #4F46E5; font-size: 36px; letter-spacing: 5px;">${otp}</h1>
             <p>This code will expire in 10 minutes.</p>
@@ -312,9 +312,9 @@ export default async function handler(req, res) {
       try {
         await sendEmail(
           email.toLowerCase(),
-          'Your Verification Code - EduSpace',
+          'Your Verification Code - Bipul\'s Class Room',
           `<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: #4F46E5;">EduSpace Verification</h2>
+            <h2 style="color: #4F46E5;">Bipul's Class Room Verification</h2>
             <p>Your verification code is:</p>
             <h1 style="color: #4F46E5; font-size: 36px; letter-spacing: 5px;">${otp}</h1>
             <p>This code will expire in 10 minutes.</p>
@@ -348,9 +348,9 @@ export default async function handler(req, res) {
       try {
         await sendEmail(
           email.toLowerCase(),
-          'Password Reset Code - EduSpace',
+          'Password Reset Code - Bipul\'s Class Room',
           `<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: #4F46E5;">EduSpace Password Reset</h2>
+            <h2 style="color: #4F46E5;">Bipul's Class Room Password Reset</h2>
             <p>Your password reset code is:</p>
             <h1 style="color: #4F46E5; font-size: 36px; letter-spacing: 5px;">${otp}</h1>
             <p>This code will expire in 10 minutes.</p>

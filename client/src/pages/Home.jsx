@@ -36,7 +36,7 @@ const Home = memo(() => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 flex flex-col items-center justify-center">
           <div className="text-center text-white px-4 max-w-4xl mb-6">
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg">
-              Welcome to EduSpace
+              Welcome to Bipul's Class Room
             </h1>
             <p className="text-sm sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow">
               Unlock your potential with expert-led video courses
@@ -156,7 +156,7 @@ const Home = memo(() => {
       <div className="py-10 sm:py-16 bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Ready to Start Learning?</h2>
-          <p className="text-sm sm:text-lg mb-6 sm:mb-8 opacity-90">Join thousands of students already learning on EduSpace</p>
+          <p className="text-sm sm:text-lg mb-6 sm:mb-8 opacity-90">Join thousands of students already learning on Bipul's Class Room</p>
           <Link
             to="/register"
             className="inline-block bg-white text-violet-600 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-sm sm:text-lg font-semibold hover:bg-gray-100 transition transform hover:scale-105 shadow-lg"

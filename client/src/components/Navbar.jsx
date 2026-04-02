@@ -20,9 +20,13 @@ const Navbar = memo(() => {
         <div className="flex justify-between h-14 sm:h-16 items-center">
           <Link 
             to="/" 
-            className="text-lg sm:text-xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent"
+            className="flex items-center"
           >
-            EduSpace
+            <img 
+              src="/logo.png" 
+              alt="Bipul's Class Room" 
+              className="h-8 sm:h-10 w-auto"
+            />
           </Link>
           <div className="flex items-center gap-2 sm:gap-6">
             <Link 

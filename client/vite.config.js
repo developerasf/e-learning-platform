@@ -9,14 +9,6 @@ export default defineConfig({
   build: {
     target: 'esnext',
     minify: 'esbuild',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-charts': ['chart.js', 'react-chartjs-2'],
-        }
-      }
-    }
+    sourcemap: false
   }
 })
