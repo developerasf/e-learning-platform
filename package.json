@@ -8,7 +8,6 @@
     "build": "cd client && npm run build"
   },
   "dependencies": {
-    "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "busboy": "^1.6.0",
     "cors": "^2.8.5",
