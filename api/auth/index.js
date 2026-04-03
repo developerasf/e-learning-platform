@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
-import { protect, admin } from '../middleware/auth.js';
-import connectDB from '../lib/db.js';
 import rateLimit from 'express-rate-limit';
+import jwt from 'jsonwebtoken';
+import connectDB from '../lib/db.js';
+import { admin, protect } from '../middleware/auth.js';
+import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -58,7 +58,7 @@ const sendEmail = async (to, subject, html) => {
       pass: process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD
     }
   });
-  
+
   await transporter.sendMail({
     from: process.env.EMAIL_USER || process.env.GMAIL_USER,
     to,
@@ -85,21 +85,21 @@ export default async function handler(req, res) {
   } catch (error) {
     return res.status(500).json({ message: 'Database connection failed: ' + error.message });
   }
-  
+
   const { method } = req;
   const path = getPath(req.url);
 
   try {
     if (method === 'POST' && (path === '/' || path === '' || path === '/register')) {
       const { name, email, password, role } = req.body;
-      
+
       if (!name || !email || !password) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
       const sanitizedName = sanitizeInput(name);
       const sanitizedEmail = sanitizeInput(email).toLowerCase();
-      
+
       if (sanitizedName.length < 2 || sanitizedName.length > 100) {
         return res.status(400).json({ message: 'Name must be between 2 and 100 characters' });
       }
@@ -143,7 +143,7 @@ export default async function handler(req, res) {
       }
 
       const sanitizedEmail = sanitizeInput(email).toLowerCase();
-      
+
       const user = await User.findOne({ email: sanitizedEmail });
 
       if (user && (await user.matchPassword(password))) {
@@ -163,13 +163,13 @@ export default async function handler(req, res) {
 
     if (method === 'POST' && path === '/send-verification-otp') {
       const { email } = req.body;
-      
+
       if (!email) {
         return res.status(400).json({ message: 'Email is required' });
       }
 
       const user = await User.findOne({ email: email.toLowerCase() });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'User not found with this email' });
       }
@@ -186,7 +186,7 @@ export default async function handler(req, res) {
           email,
           'Your Verification Code',
           `<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-            <h2 style="color: #4F46E5;">Bipul's Class Room Verification</h2>
+            <h2 style="color: #4F46E5;">Bipul's Class Room </h2>
             <p>Your verification code is:</p>
             <h1 style="color: #4F46E5; font-size: 36px; letter-spacing: 5px;">${otp}</h1>
             <p>This code will expire in 10 minutes.</p>
@@ -202,13 +202,13 @@ export default async function handler(req, res) {
 
     if (method === 'POST' && path === '/verify-otp') {
       const { email, otp } = req.body;
-      
+
       if (!email || !otp) {
         return res.status(400).json({ message: 'Email and OTP are required' });
       }
 
       const user = await User.findOne({ email: email.toLowerCase() });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -218,7 +218,7 @@ export default async function handler(req, res) {
       }
 
       const isValid = user.verifyOTP(otp, 'verification');
-      
+
       if (!isValid) {
         return res.status(400).json({ message: 'Invalid or expired verification code' });
       }
@@ -238,7 +238,7 @@ export default async function handler(req, res) {
       }
 
       const existingUser = await User.findOne({ email: email.toLowerCase() });
-      
+
       if (existingUser && existingUser.isVerified) {
         return res.status(400).json({ message: 'User already exists' });
       }
@@ -256,7 +256,7 @@ export default async function handler(req, res) {
       } else {
         const tempUser = new User({ name, email: email.toLowerCase(), password, role: role || 'student' });
         const isValid = tempUser.verifyOTP(otp, 'verification');
-        
+
         if (!isValid) {
           return res.status(400).json({ message: 'Invalid or expired verification code' });
         }
@@ -331,13 +331,13 @@ export default async function handler(req, res) {
 
     if (method === 'POST' && path === '/forgot-password') {
       const { email } = req.body;
-      
+
       if (!email) {
         return res.status(400).json({ message: 'Email is required' });
       }
 
       const user = await User.findOne({ email: email.toLowerCase() });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'No account found with this email' });
       }
@@ -366,19 +366,19 @@ export default async function handler(req, res) {
 
     if (method === 'POST' && path === '/reset-password') {
       const { email, otp, newPassword } = req.body;
-      
+
       if (!email || !otp || !newPassword) {
         return res.status(400).json({ message: 'Email, OTP and new password are required' });
       }
 
       const user = await User.findOne({ email: email.toLowerCase() });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
 
       const isValid = user.verifyOTP(otp, 'passwordReset');
-      
+
       if (!isValid) {
         return res.status(400).json({ message: 'Invalid or expired reset code' });
       }
@@ -393,15 +393,15 @@ export default async function handler(req, res) {
     if (method === 'POST' && path === '/change-password') {
       const authError = await protect(req, res);
       if (authError) return authError;
-      
+
       const { currentPassword, newPassword } = req.body;
-      
+
       if (!currentPassword || !newPassword) {
         return res.status(400).json({ message: 'Current password and new password are required' });
       }
 
       const user = await User.findById(req.user._id);
-      
+
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -419,16 +419,16 @@ export default async function handler(req, res) {
 
     if (method === 'POST' && path === '/google-auth') {
       const { googleId, name, email, avatar } = req.body;
-      
+
       if (!googleId || !email) {
         return res.status(400).json({ message: 'Google ID and email are required' });
       }
 
       let user = await User.findOne({ googleId });
-      
+
       if (!user) {
         user = await User.findOne({ email: email.toLowerCase() });
-        
+
         if (user) {
           user.googleId = googleId;
           user.isVerified = true;
@@ -461,7 +461,7 @@ export default async function handler(req, res) {
     if (method === 'GET' && path === '/me') {
       const authError = await protect(req, res);
       if (authError) return authError;
-      
+
       const user = await User.findById(req.user._id).select('-password');
       return res.json(user);
     }
@@ -469,10 +469,10 @@ export default async function handler(req, res) {
     if (method === 'GET' && path === '/users') {
       const authError = await protect(req, res);
       if (authError) return authError;
-      
+
       const adminError = admin(req, res);
       if (adminError) return adminError;
-      
+
       const users = await User.find().select('-password').sort('-createdAt');
       return res.json(users);
     }
@@ -480,10 +480,10 @@ export default async function handler(req, res) {
     if (method === 'POST' && path === '/users') {
       const authError = await protect(req, res);
       if (authError) return authError;
-      
+
       const adminError = admin(req, res);
       if (adminError) return adminError;
-      
+
       const { name, email, password, role } = req.body;
 
       const userExists = await User.findOne({ email });
@@ -510,13 +510,13 @@ export default async function handler(req, res) {
     const deleteUserMatch = path && path.match(/^\/users\/([^/]+)$/);
     if (method === 'DELETE' && deleteUserMatch) {
       const userId = deleteUserMatch[1];
-      
+
       const authError = await protect(req, res);
       if (authError) return authError;
-      
+
       const adminError = admin(req, res);
       if (adminError) return adminError;
-      
+
       const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
