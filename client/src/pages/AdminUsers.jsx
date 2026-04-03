@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const AdminUsers = memo(() => {
   const [users, setUsers] = useState([]);
@@ -8,6 +9,7 @@ const AdminUsers = memo(() => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'student' });
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -42,23 +44,34 @@ const AdminUsers = memo(() => {
       },
       body: JSON.stringify(formData)
     });
+    const data = await res.json();
     if (res.ok) {
-      const newUser = await res.json();
-      setUsers([newUser, ...users]);
+      setUsers([data, ...users]);
       setShowForm(false);
       setFormData({ name: '', email: '', password: '', role: 'student' });
+      toast.success('User created successfully');
+    } else {
+      toast.error(data.message || 'Failed to create user');
     }
     setSaving(false);
   };
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
+    setDeletingId(id);
     const token = localStorage.getItem('token');
-    await fetch(`/api/auth/users/${id}`, {
+    const res = await fetch(`/api/auth/users/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    setUsers(users.filter(u => u._id !== id));
+    if (res.ok) {
+      setUsers(users.filter(u => u._id !== id));
+      toast.success('User deleted successfully');
+    } else {
+      const data = await res.json();
+      toast.error(data.message || 'Failed to delete user');
+    }
+    setDeletingId(null);
   };
 
   if (loading) return <div className="p-4 sm:p-8 text-center text-sm sm:text-base text-gray-700 dark:text-gray-300">Loading...</div>;
@@ -162,16 +175,17 @@ const AdminUsers = memo(() => {
                   <td className="px-4 sm:px-6 py-4 text-gray-500 dark:text-gray-400">
                     {new Date(u.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-4 sm:px-6 py-4">
-                    {u._id !== user?._id && (
-                      <button
-                        onClick={() => handleDelete(u._id)}
-                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </td>
+                    <td className="px-4 sm:px-6 py-4">
+                      {u._id !== user?._id && (
+                        <button
+                          onClick={() => handleDelete(u._id)}
+                          disabled={deletingId === u._id}
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:opacity-50"
+                        >
+                          {deletingId === u._id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      )}
+                    </td>
                 </tr>
               ))}
             </tbody>

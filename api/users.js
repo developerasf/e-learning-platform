@@ -117,22 +117,32 @@ export default async function handler(req, res) {
       const adminError = admin(req, res);
       if (adminError) return adminError;
 
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const totalCourses = await Course.countDocuments({ isPublished: true });
+
       const courses = await Course.find({ isPublished: true })
-        .select('title description category enrolledStudents')
+        .select('title description category enrolledStudents createdAt')
         .populate('createdBy', 'name')
-        .sort('-createdAt');
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(limit);
 
-      const coursesWithStats = await Promise.all(courses.map(async (course) => {
-        const enrollments = await Enrollment.find({
-          course: course._id,
-          status: 'approved'
-        });
+      const courseIds = courses.map(c => c._id);
+      const enrollments = await Enrollment.aggregate([
+        { $match: { course: { $in: courseIds }, status: 'approved' } },
+        { $group: { _id: '$course', count: { $sum: 1 }, totalWatched: { $sum: { $size: '$watchedVideos' } } } }
+      ]);
 
-        let totalWatched = 0;
-        enrollments.forEach(e => {
-          totalWatched += e.watchedVideos.length;
-        });
+      const enrollmentMap = {};
+      enrollments.forEach(e => {
+        enrollmentMap[e._id.toString()] = { count: e.count, totalWatched: e.totalWatched };
+      });
 
+      const coursesWithStats = courses.map(course => {
+        const stats = enrollmentMap[course._id.toString()] || { count: 0, totalWatched: 0 };
         return {
           _id: course._id,
           title: course.title,
@@ -140,14 +150,20 @@ export default async function handler(req, res) {
           category: course.category,
           createdBy: course.createdBy,
           totalStudents: course.enrolledStudents?.length || 0,
-          totalWatchedVideos: totalWatched,
-          avgWatchedPerStudent: course.enrolledStudents?.length > 0 
-            ? Math.round(totalWatched / course.enrolledStudents.length) 
-            : 0
+          totalWatchedVideos: stats.totalWatched,
+          avgWatchedPerStudent: stats.count > 0 ? Math.round(stats.totalWatched / stats.count) : 0
         };
-      }));
+      });
 
-      return res.json(coursesWithStats);
+      return res.json({
+        courses: coursesWithStats,
+        pagination: {
+          total: totalCourses,
+          page,
+          limit,
+          pages: Math.ceil(totalCourses / limit)
+        }
+      });
     }
 
     if (method === 'GET' && trackingCourseMatch && !path.includes('/student/')) {

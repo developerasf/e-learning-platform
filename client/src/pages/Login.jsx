@@ -55,8 +55,9 @@ const Login = memo(() => {
         )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Email</label>
+            <label htmlFor="email" className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Email</label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -66,12 +67,13 @@ const Login = memo(() => {
           </div>
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-gray-700 dark:text-gray-300 text-sm sm:text-base">Password</label>
+              <label htmlFor="password" className="block text-gray-700 dark:text-gray-300 text-sm sm:text-base">Password</label>
               <Link to="/forgot-password" className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:underline">
                 Forgot password?
               </Link>
             </div>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

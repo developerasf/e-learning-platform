@@ -89,11 +89,17 @@ const courseSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 });
 
 courseSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();
 });
+
+courseSchema.index({ createdBy: 1 });
+courseSchema.index({ isPublished: 1, category: 1 });
+courseSchema.index({ createdAt: -1 });
 
 export default mongoose.model('Course', courseSchema);

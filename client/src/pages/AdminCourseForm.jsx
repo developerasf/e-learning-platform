@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const AdminCourseForm = memo(() => {
   const { id } = useParams();
@@ -50,14 +51,14 @@ const AdminCourseForm = memo(() => {
       const data = await res.json();
       setCourse({ ...course, thumbnail: data.url });
     } else {
-      alert('Upload failed');
+      toast.error('Upload failed');
     }
     setUploading(false);
   };
 
   const handleUploadNotes = async (chapterId, file) => {
     if (!file || file.type !== 'application/pdf') {
-      alert('Please upload a PDF file');
+      toast.warn('Please upload a PDF file');
       return;
     }
     
@@ -91,14 +92,14 @@ const AdminCourseForm = memo(() => {
           const updatedCourse = await saveRes.json();
           setCourse(updatedCourse);
           setNewNoteTitle({ ...newNoteTitle, [chapterId]: '' });
-          alert('Notes uploaded successfully!');
+          toast.success('Notes uploaded successfully!');
         }
       } else {
-        alert('Upload failed');
+        toast.error('Upload failed');
       }
     } catch (error) {
       console.error(error);
-      alert('Upload failed');
+      toast.error('Upload failed');
     }
     setNotesUploading(false);
     setShowNotesForm('');
@@ -107,12 +108,12 @@ const AdminCourseForm = memo(() => {
   const handleAddGoogleDriveNote = async (chapterId) => {
     const url = newNoteUrl[chapterId]?.trim();
     if (!url) {
-      alert('Please enter a Google Drive link');
+      toast.warn('Please enter a Google Drive link');
       return;
     }
 
     if (!url.includes('drive.google.com') && !url.includes('docs.google.com')) {
-      alert('Please enter a valid Google Drive or Google Docs link');
+      toast.warn('Please enter a valid Google Drive or Google Docs link');
       return;
     }
 
@@ -135,13 +136,13 @@ const AdminCourseForm = memo(() => {
         setCourse(updatedCourse);
         setNewNoteTitle({ ...newNoteTitle, [chapterId]: '' });
         setNewNoteUrl({ ...newNoteUrl, [chapterId]: '' });
-        alert('Google Drive note added successfully!');
+        toast.success('Google Drive note added successfully!');
       } else {
-        alert('Failed to add note');
+        toast.error('Failed to add note');
       }
     } catch (error) {
       console.error(error);
-      alert('Failed to add note');
+      toast.error('Failed to add note');
     }
     setNotesUploading(false);
     setShowNotesForm('');
@@ -167,7 +168,7 @@ const AdminCourseForm = memo(() => {
 
   const handleSave = async () => {
     if (!course.title || !course.description) {
-      alert('Please fill in title and description');
+      toast.warn('Please fill in title and description');
       return;
     }
     setSaving(true);
@@ -195,16 +196,16 @@ const AdminCourseForm = memo(() => {
         navigate(`/admin/courses/${data._id}/edit`);
       } else {
         setCourse(data);
-        alert('Course saved successfully!');
+        toast.success('Course saved successfully!');
       }
     } else {
       const text = await res.text();
       console.error('Error response:', text);
       try {
         const error = JSON.parse(text);
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } catch (e) {
-        alert('Error: ' + text);
+        toast.error('Error: ' + text);
       }
     }
     setSaving(false);
@@ -289,7 +290,7 @@ const AdminCourseForm = memo(() => {
       }
     } catch (error) {
       console.error(error);
-      alert('Failed to delete note');
+      toast.error('Failed to delete note');
     }
   };
 
@@ -310,11 +311,11 @@ const AdminCourseForm = memo(() => {
       if (res.ok) {
         const updatedCourse = await res.json();
         setCourse(updatedCourse);
-        alert('Notes deleted successfully!');
+        toast.success('Notes deleted successfully!');
       }
     } catch (error) {
       console.error(error);
-      alert('Failed to delete notes');
+        toast.error('Failed to delete notes');
     }
     setShowNotesForm('');
   };

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -8,6 +8,17 @@ const Navbar = memo(() => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const { isDark, toggleTheme } = useTheme();
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -21,6 +32,7 @@ const Navbar = memo(() => {
           <Link 
             to="/" 
             className="flex items-center"
+            aria-label="Bipul's Classroom Home"
           >
             <img 
               src="/logo.png" 
@@ -73,6 +85,7 @@ const Navbar = memo(() => {
                   onClick={toggleTheme}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                   title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                  aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {isDark ? (
                     <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -84,10 +97,12 @@ const Navbar = memo(() => {
                     </svg>
                   )}
                 </button>
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button 
                     onClick={() => setShowDropdown(!showDropdown)}
                     className="flex items-center gap-2 sm:gap-3"
+                    aria-label="User menu"
+                    aria-expanded={showDropdown}
                   >
                     <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
                       {user.name?.charAt(0).toUpperCase()}

@@ -1,5 +1,6 @@
 import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import connectDB from '../lib/db.js';
 import { admin, protect } from '../middleware/auth.js';
 import User from '../models/User.js';
@@ -27,6 +28,10 @@ const otpLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false
 });
+
+const checkOtpLimit = (req, res) => {
+  return otpLimiter(req, res, () => {});
+};
 
 const generateToken = (id) => {
   if (!JWT_SECRET) {
@@ -162,6 +167,9 @@ export default async function handler(req, res) {
     }
 
     if (method === 'POST' && path === '/send-verification-otp') {
+      const rateLimitError = checkOtpLimit(req, res);
+      if (rateLimitError) return rateLimitError;
+
       const { email } = req.body;
 
       if (!email) {
@@ -231,6 +239,9 @@ export default async function handler(req, res) {
     }
 
     if (method === 'POST' && path === '/register-with-otp') {
+      const rateLimitError = checkOtpLimit(req, res);
+      if (rateLimitError) return rateLimitError;
+
       const { name, email, password, role, otp } = req.body;
 
       if (!name || !email || !password || !otp) {
@@ -283,6 +294,9 @@ export default async function handler(req, res) {
     }
 
     if (method === 'POST' && path === '/send-register-otp') {
+      const rateLimitError = checkOtpLimit(req, res);
+      if (rateLimitError) return rateLimitError;
+
       const { name, email, password, role } = req.body;
 
       if (!name || !email || !password) {
@@ -330,6 +344,9 @@ export default async function handler(req, res) {
     }
 
     if (method === 'POST' && path === '/forgot-password') {
+      const rateLimitError = checkOtpLimit(req, res);
+      if (rateLimitError) return rateLimitError;
+
       const { email } = req.body;
 
       if (!email) {
@@ -383,7 +400,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Invalid or expired reset code' });
       }
 
-      user.password = newPassword;
+      user.password = await bcrypt.hash(newPassword, 10);
       user.passwordResetOTP = undefined;
       await user.save();
 
@@ -411,7 +428,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Current password is incorrect' });
       }
 
-      user.password = newPassword;
+      user.password = await bcrypt.hash(newPassword, 10);
       await user.save();
 
       return res.json({ message: 'Password changed successfully' });

@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const AdminDashboard = memo(() => {
   const [courses, setCourses] = useState([]);
@@ -58,13 +59,13 @@ const AdminDashboard = memo(() => {
       if (res.ok) {
         const data = await res.json();
         setBanner(data.url);
-        alert('Banner uploaded successfully!');
+        toast.success('Banner uploaded successfully!');
       } else {
-        alert('Upload failed');
+        toast.error('Upload failed');
       }
     } catch (error) {
       console.error(error);
-      alert('Upload failed');
+      toast.error('Upload failed');
     }
     setBannerUploading(false);
   };

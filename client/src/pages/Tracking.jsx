@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const Tracking = memo(() => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState(null);
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -22,14 +23,19 @@ const Tracking = memo(() => {
     fetchCourses();
   }, [user, authLoading]);
 
-  const fetchCourses = async () => {
+  const fetchCourses = async (page = 1) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/users/tracking', {
+      const res = await fetch(`/api/users/tracking?page=${page}&limit=10`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      setCourses(data);
+      if (data.courses) {
+        setCourses(data.courses);
+        setPagination(data.pagination);
+      } else {
+        setCourses(data);
+      }
     } catch (error) {
       console.error('Error fetching courses:', error);
     } finally {

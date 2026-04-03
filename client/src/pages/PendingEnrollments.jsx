@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const PendingEnrollments = memo(() => {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -29,20 +30,24 @@ const PendingEnrollments = memo(() => {
   };
 
   const handleApprove = async (enrollmentId, courseId) => {
+    setProcessingId(enrollmentId);
     const token = localStorage.getItem('token');
     await fetch(`/api/courses/${courseId}/enrollments/${enrollmentId}/approve`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    setProcessingId(null);
     loadEnrollments();
   };
 
   const handleReject = async (enrollmentId, courseId) => {
+    setProcessingId(enrollmentId);
     const token = localStorage.getItem('token');
     await fetch(`/api/courses/${courseId}/enrollments/${enrollmentId}/reject`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    setProcessingId(null);
     loadEnrollments();
   };
 
@@ -88,15 +93,17 @@ const PendingEnrollments = memo(() => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleApprove(enrollment._id, enrollment.course._id)}
-                          className="bg-green-600 text-white px-4 py-1 rounded text-sm hover:bg-green-700"
+                          disabled={processingId === enrollment._id}
+                          className="bg-green-600 text-white px-4 py-1 rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Approve
+                          {processingId === enrollment._id ? 'Processing...' : 'Approve'}
                         </button>
                         <button
                           onClick={() => handleReject(enrollment._id, enrollment.course._id)}
-                          className="bg-red-500 text-white px-4 py-1 rounded text-sm hover:bg-red-600"
+                          disabled={processingId === enrollment._id}
+                          className="bg-red-500 text-white px-4 py-1 rounded text-sm hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Reject
+                          {processingId === enrollment._id ? 'Processing...' : 'Reject'}
                         </button>
                       </div>
                     </td>
@@ -123,15 +130,17 @@ const PendingEnrollments = memo(() => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleApprove(enrollment._id, enrollment.course._id)}
-                    className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex-1"
+                    disabled={processingId === enrollment._id}
+                    className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Approve
+                    {processingId === enrollment._id ? 'Processing...' : 'Approve'}
                   </button>
                   <button
                     onClick={() => handleReject(enrollment._id, enrollment.course._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 flex-1"
+                    disabled={processingId === enrollment._id}
+                    className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Reject
+                    {processingId === enrollment._id ? 'Processing...' : 'Reject'}
                   </button>
                 </div>
               </div>
