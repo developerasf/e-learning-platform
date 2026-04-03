@@ -6,6 +6,8 @@
   "rewrites": [
     { "source": "/api/health", "destination": "/api/health.js" },
     { "source": "/api/health/(.*)", "destination": "/api/health.js" },
+    { "source": "/api/sitemap.xml", "destination": "/api/sitemap.js" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap.js" },
     { "source": "/api/auth", "destination": "/api/auth/index.js" },
     { "source": "/api/auth/(.*)", "destination": "/api/auth/index.js" },
     { "source": "/api/users", "destination": "/api/users.js" },

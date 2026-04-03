@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /courses
+Allow: /courses/*
+Allow: /login
+Allow: /register
+
+Disallow: /admin
+Disallow: /api
+Disallow: /change-password
+Disallow: /forgot-password
+
+Sitemap: https://bipulsclassroom.com/sitemap.xml
