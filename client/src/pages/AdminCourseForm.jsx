@@ -30,6 +30,31 @@ const AdminCourseForm = memo(() => {
   const [newNoteTitle, setNewNoteTitle] = useState({});
   const [newNoteUrl, setNewNoteUrl] = useState({});
 
+  const handleThumbnailUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('thumbnail', file);
+    
+    const token = localStorage.getItem('token');
+    
+    const res = await fetch('/api/upload/thumbnail', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      setCourse({ ...course, thumbnail: data.url });
+    } else {
+      alert('Upload failed');
+    }
+    setUploading(false);
+  };
+
   const handleUploadNotes = async (chapterId, file) => {
     if (!file || file.type !== 'application/pdf') {
       alert('Please upload a PDF file');
