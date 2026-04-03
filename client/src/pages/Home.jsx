@@ -60,53 +60,53 @@ const Home = memo(() => {
       </div>
 
       {/* Features Section */}
-      <div className="py-10 sm:py-16 bg-gray-50">
+      <div className="py-10 sm:py-16 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-3 sm:px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition text-center group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-violet-500 transition">
+            <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition text-center group">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-violet-100 dark:bg-violet-900/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-violet-500 transition">
                 <span className="text-2xl sm:text-3xl">📚</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">Expert Teachers</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Learn from industry experts with years of experience.</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800 dark:text-white">Expert Teachers</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Learn from industry experts with years of experience.</p>
             </div>
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition text-center group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-indigo-500 transition">
+            <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition text-center group">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-indigo-500 transition">
                 <span className="text-2xl sm:text-3xl">🎥</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">Video Lessons</h3>
-              <p className="text-gray-600 text-sm sm:text-base">High-quality video content accessible anytime, anywhere.</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800 dark:text-white">Video Lessons</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">High-quality video content accessible anytime, anywhere.</p>
             </div>
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition text-center group sm:col-span-2 lg:col-span-1">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-purple-500 transition">
+            <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition text-center group sm:col-span-2 lg:col-span-1">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 group-hover:bg-purple-500 transition">
                 <span className="text-2xl sm:text-3xl">🏆</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">Earn Certificates</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Complete courses and earn certificates to showcase your skills.</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800 dark:text-white">Earn Certificates</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Complete courses and earn certificates to showcase your skills.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Featured Courses */}
-      <div className="py-10 sm:py-16 bg-white">
+      <div className="py-10 sm:py-16 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-3 sm:px-4">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Featured Courses</h2>
-            <p className="text-gray-600 text-sm sm:text-base">Start learning from our most popular courses</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">Featured Courses</h2>
+            <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Start learning from our most popular courses</p>
           </div>
           
           {courses.length === 0 ? (
-            <p className="text-center text-gray-600">No courses available yet.</p>
+            <p className="text-center text-gray-600 dark:text-gray-400">No courses available yet.</p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
               {courses.map(course => (
                 <Link
                   key={course._id}
                   to={`/courses/${course._id}`}
-                  className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+                  className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700"
                 >
-                  <div className="h-36 sm:h-48 bg-gray-200 overflow-hidden relative">
+                  <div className="h-36 sm:h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden relative">
                     {course.thumbnail ? (
                       <img 
                         src={course.thumbnail} 
@@ -116,18 +116,18 @@ const Home = memo(() => {
                         decoding="async"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-50 to-indigo-50">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-50 dark:from-violet-900/30 to-indigo-50 dark:from-indigo-900/30">
                         <span className="text-5xl sm:text-6xl">📚</span>
                       </div>
                     )}
-                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-violet-600">
+                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-violet-600 dark:text-violet-400">
                       {course.price === 0 ? 'Free' : `BDT ${course.price}`}
                     </div>
                   </div>
                   <div className="p-4 sm:p-5">
-                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 group-hover:text-violet-600 transition">{course.title}</h3>
-                    <p className="text-gray-600 text-sm mb-2 sm:mb-3 line-clamp-2">{course.description}</p>
-                    <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-800 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition">{course.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-2 sm:mb-3 line-clamp-2">{course.description}</p>
+                    <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                       <span>By {course.createdBy?.name || 'Unknown'}</span>
                     </div>
                   </div>
@@ -140,7 +140,7 @@ const Home = memo(() => {
             <div className="text-center mt-10">
               <Link
                 to="/courses"
-                className="inline-flex items-center text-violet-600 font-medium hover:text-violet-700 transition"
+                className="inline-flex items-center text-violet-600 dark:text-violet-400 font-medium hover:text-violet-700 dark:hover:text-violet-300 transition"
               >
                 View All Courses
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
