@@ -99,6 +99,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Title and description are required' });
     }
 
+    if (title.length > 200 || description.length > 5000) {
+      return res.status(400).json({ message: 'Title must be under 200 chars and description under 5000 chars' });
+    }
+
     const validCategory = ['default', 'latest', 'popular'].includes(category) ? category : 'default';
     
     const course = await Course.create({
@@ -449,7 +453,14 @@ export default async function handler(req, res) {
       if (!course) {
         return res.status(404).json({ message: 'Course not found' });
       }
-      
+       
+      if (title && title.length > 200) {
+        return res.status(400).json({ message: 'Title must be under 200 characters' });
+      }
+      if (description && description.length > 5000) {
+        return res.status(400).json({ message: 'Description must be under 5000 characters' });
+      }
+       
       course.title = title || course.title;
       course.description = description || course.description;
       course.thumbnail = thumbnail || course.thumbnail;
@@ -477,6 +488,7 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: 'Course not found' });
       }
       
+      await Enrollment.deleteMany({ course: courseId });
       await course.deleteOne();
       return res.json({ message: 'Course deleted' });
     }
