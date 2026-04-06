@@ -96,4 +96,8 @@ courseSchema.pre('save', function(next) {
   next();
 });
 
+courseSchema.index({ isPublished: 1, category: 1, createdAt: -1 });
+courseSchema.index({ createdBy: 1 });
+courseSchema.index({ category: 1 });
+
 export default mongoose.model('Course', courseSchema);

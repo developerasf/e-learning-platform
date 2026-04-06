@@ -61,6 +61,10 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
+userSchema.index({ role: 1 });
+userSchema.index({ isVerified: 1 });
+userSchema.index({ createdAt: -1 });
+
 userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

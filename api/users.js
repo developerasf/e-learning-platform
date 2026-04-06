@@ -76,7 +76,7 @@ export default async function handler(req, res) {
       if (authError) return authError;
 
       const user = await User.findById(req.user._id)
-        .select('-password -verificationOTP -passwordResetOTP');
+        .select('-password -verificationOTP -passwordResetOTP -enrolledCourses');
 
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -87,6 +87,7 @@ export default async function handler(req, res) {
         status: 'approved'
       }).populate({
         path: 'course',
+        select: 'title description thumbnail createdBy',
         populate: { path: 'createdBy', select: 'name' }
       });
 

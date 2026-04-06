@@ -66,6 +66,7 @@ export default async function handler(req, res) {
     }
 
     const courses = await Course.find(query)
+      .select('title description thumbnail price category createdBy createdAt')
       .populate('createdBy', 'name')
       .skip(skip)
       .limit(parseInt(limit))
@@ -128,6 +129,7 @@ export default async function handler(req, res) {
       status: 'approved' 
     }).populate({
       path: 'course',
+      select: 'title description thumbnail createdBy',
       populate: { path: 'createdBy', select: 'name' }
     });
     
