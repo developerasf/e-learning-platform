@@ -71,48 +71,45 @@ const AdminCourseForm = memo(() => {
     }
   };
 
-  const extractDriveFileName = (url) => {
+  const extractDriveFileName = async (url) => {
     if (!url) return '';
     
-    // Handle docs.google.com/document/d/.../edit
+    try {
+      const response = await fetch(`https://drive.google.com/getvideoplayback?content=${encodeURIComponent(url)}`);
+      // Google Drive doesn't have public oEmbed, so we extract from URL patterns
+    } catch (e) {}
+    
+    // Fallback: create meaningful name from URL
     if (url.includes('docs.google.com/document/d/')) {
       const match = url.match(/\/document\/d\/([^\/]+)/);
-      if (match) return 'Document - ' + match[1].substring(0, 8);
+      if (match) return 'Document';
     }
-    
-    // Handle docs.google.com/spreadsheets/d/.../edit
     if (url.includes('docs.google.com/spreadsheets/d/')) {
       const match = url.match(/\/spreadsheets\/d\/([^\/]+)/);
-      if (match) return 'Spreadsheet - ' + match[1].substring(0, 8);
+      if (match) return 'Spreadsheet';
     }
-    
-    // Handle docs.google.com/presentation/d/.../edit
     if (url.includes('docs.google.com/presentation/d/')) {
       const match = url.match(/\/presentation\/d\/([^\/]+)/);
-      if (match) return 'Presentation - ' + match[1].substring(0, 8);
+      if (match) return 'Presentation';
     }
-    
-    // Handle drive.google.com/file/d/.../view
     if (url.includes('drive.google.com/file/d/')) {
       const match = url.match(/\/file\/d\/([^\/]+)/);
-      if (match) return 'File - ' + match[1].substring(0, 8);
+      if (match) return 'Drive File';
     }
-    
-    // Handle drive.google.com/drive/folders/...
     if (url.includes('drive.google.com/drive/folders/')) {
       const match = url.match(/\/folders\/([^\/]+)/);
-      if (match) return 'Folder - ' + match[1].substring(0, 8);
+      if (match) return 'Folder';
     }
     
-    return 'Google Drive Link';
+    return 'Note';
   };
 
-  const handleNoteUrlChange = (e, chapterId) => {
+  const handleNoteUrlChange = async (e, chapterId) => {
     const url = e.target.value;
     setNewNoteUrl({ ...newNoteUrl, [chapterId]: url });
     
     if (url && !newNoteTitle[chapterId]) {
-      const detectedName = extractDriveFileName(url);
+      const detectedName = await extractDriveFileName(url);
       setNewNoteTitle({ ...newNoteTitle, [chapterId]: detectedName });
     }
   };
