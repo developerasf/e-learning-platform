@@ -54,29 +54,57 @@ const AdminCourseForm = memo(() => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const handleYoutubeUrlChange = async (e) => {
+  const handleYoutubeUrlChange = (e) => {
     const url = e.target.value;
-    setNewVideo({ ...newVideo, youtubeUrl: url, chapterId: newVideo.chapterId });
+    const videoId = extractVideoId(url);
+    const chapterId = newVideo.chapterId;
     
-    if (url && !newVideo.title) {
-      const videoId = extractVideoId(url);
-      if (videoId) {
-        setNewVideo(prev => ({ ...prev, title: 'YouTube Video ' + (Date.now() % 1000) }));
-      }
+    if (videoId) {
+      setNewVideo({ 
+        ...newVideo, 
+        youtubeUrl: url, 
+        chapterId: chapterId,
+        title: `Video ${videoId}` 
+      });
+    } else {
+      setNewVideo({ ...newVideo, youtubeUrl: url, chapterId: chapterId });
     }
   };
 
   const extractDriveFileName = (url) => {
     if (!url) return '';
+    
+    // Handle docs.google.com/document/d/.../edit
+    if (url.includes('docs.google.com/document/d/')) {
+      const match = url.match(/\/document\/d\/([^\/]+)/);
+      if (match) return 'Document - ' + match[1].substring(0, 8);
+    }
+    
+    // Handle docs.google.com/spreadsheets/d/.../edit
+    if (url.includes('docs.google.com/spreadsheets/d/')) {
+      const match = url.match(/\/spreadsheets\/d\/([^\/]+)/);
+      if (match) return 'Spreadsheet - ' + match[1].substring(0, 8);
+    }
+    
+    // Handle docs.google.com/presentation/d/.../edit
+    if (url.includes('docs.google.com/presentation/d/')) {
+      const match = url.match(/\/presentation\/d\/([^\/]+)/);
+      if (match) return 'Presentation - ' + match[1].substring(0, 8);
+    }
+    
+    // Handle drive.google.com/file/d/.../view
     if (url.includes('drive.google.com/file/d/')) {
       const match = url.match(/\/file\/d\/([^\/]+)/);
-      if (match) return 'Google Drive File ' + match[1].substring(0, 6);
+      if (match) return 'File - ' + match[1].substring(0, 8);
     }
-    if (url.includes('docs.google.com')) {
-      const match = url.match(/\/([^\/]+)\/edit/);
-      if (match) return 'Google Doc: ' + decodeURIComponent(match[1]);
+    
+    // Handle drive.google.com/drive/folders/...
+    if (url.includes('drive.google.com/drive/folders/')) {
+      const match = url.match(/\/folders\/([^\/]+)/);
+      if (match) return 'Folder - ' + match[1].substring(0, 8);
     }
-    return 'Google Drive Note';
+    
+    return 'Google Drive Link';
   };
 
   const handleNoteUrlChange = (e, chapterId) => {
@@ -92,6 +120,7 @@ const AdminCourseForm = memo(() => {
   const handleFileSelect = (e, chapterId) => {
     const file = e.target.files[0];
     if (file) {
+      // Get filename without extension
       const fileName = file.name.replace(/\.[^/.]+$/, '');
       setNewNoteTitle({ ...newNoteTitle, [chapterId]: fileName });
       handleUploadNotes(chapterId, file);
