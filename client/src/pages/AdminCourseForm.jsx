@@ -30,16 +30,15 @@ const AdminCourseForm = memo(() => {
   const [newNoteTitle, setNewNoteTitle] = useState({});
   const [newNoteUrl, setNewNoteUrl] = useState({});
 
-  const extractYouTubeTitle = async (url) => {
-    if (!url) return '';
+  const getYouTubeTitle = async (url) => {
     const videoId = extractVideoId(url);
     if (!videoId) return '';
     
     try {
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=AIzaSyA9vT6S_R6lL2XUZdN3X1lX1lX1lX1lX1lX&part=snippet`);
+      const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
       const data = await response.json();
-      if (data.items && data.items[0] && data.items[0].snippet) {
-        return data.items[0].snippet.title;
+      if (data.title) {
+        return data.title;
       }
     } catch (e) {
       console.log('Could not fetch YouTube title');
@@ -54,17 +53,18 @@ const AdminCourseForm = memo(() => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const handleYoutubeUrlChange = (e) => {
+  const handleYoutubeUrlChange = async (e) => {
     const url = e.target.value;
     const videoId = extractVideoId(url);
     const chapterId = newVideo.chapterId;
     
     if (videoId) {
+      const title = await getYouTubeTitle(url);
       setNewVideo({ 
         ...newVideo, 
         youtubeUrl: url, 
         chapterId: chapterId,
-        title: `Video ${videoId}` 
+        title: title || `Video ${videoId}` 
       });
     } else {
       setNewVideo({ ...newVideo, youtubeUrl: url, chapterId: chapterId });
