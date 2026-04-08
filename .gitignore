@@ -10,7 +10,8 @@ client/node_modules/
 
 # Vercel
 .vercel/
-
+# Opencode
+.opencode/
 # Build outputs
 dist/
 client/dist/

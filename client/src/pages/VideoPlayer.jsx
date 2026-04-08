@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Maximize, Minimize, Star, CheckCircle, ChevronDown, ChevronUp, FileText, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 
 const VideoPlayer = memo(() => {
   const { courseId, videoId } = useParams();
@@ -11,7 +12,7 @@ const VideoPlayer = memo(() => {
   const [currentChapter, setCurrentChapter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [enrolled, setEnrolled] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [watchedVideos, setWatchedVideos] = useState([]);
@@ -20,6 +21,7 @@ const VideoPlayer = memo(() => {
   const [videoRating, setVideoRating] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [youtubeApiReady, setYoutubeApiReady] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState({});
   
   const videoContainerRef = useRef(null);
   const playerRef = useRef(null);
@@ -75,9 +77,7 @@ const VideoPlayer = memo(() => {
         } else {
           const result = await checkEnrollment(courseId);
           setEnrolled(result);
-          if (result) {
-            fetchProgress();
-          }
+          if (result) fetchProgress();
         }
       };
       checkEnrolled();
@@ -225,6 +225,10 @@ const VideoPlayer = memo(() => {
     }
   }, []);
 
+  const toggleChapter = (chapterId) => {
+    setSidebarCollapsed(prev => ({ ...prev, [chapterId]: !prev[chapterId] }));
+  };
+
   const allVideos = useMemo(() => {
     if (!course?.chapters) return [];
     const videos = [];
@@ -239,31 +243,46 @@ const VideoPlayer = memo(() => {
   const currentIndex = useMemo(() => allVideos.findIndex(v => v._id === videoId), [allVideos, videoId]);
   const nextVideo = useMemo(() => allVideos[currentIndex + 1], [allVideos, currentIndex]);
   const prevVideo = useMemo(() => allVideos[currentIndex - 1], [allVideos, currentIndex]);
-
   const isWatched = watchedVideos.includes(videoId);
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-black">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-violet-500 border-t-transparent"></div>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-900/30 mb-4">
+            <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+          <p className="text-slate-400">Loading video...</p>
+        </div>
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="text-center text-sm sm:text-base">Course not found</div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">⚠</span>
+          </div>
+          <p className="text-slate-600 dark:text-slate-400 text-lg">Course not found</p>
+          <Link to="/courses" className="text-violet-600 dark:text-violet-400 font-medium mt-4 inline-block cursor-pointer">
+            Browse Courses
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (!user || !enrolled) {
     return (
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="text-center">
-          <p className="text-base sm:text-xl mb-4">You need to enroll to watch this video.</p>
-          <Link to={`/courses/${courseId}`} className="text-violet-600 hover:underline text-sm sm:text-base">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700">
+          <div className="w-20 h-20 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-4">
+            <Play className="w-10 h-10 text-amber-600" />
+          </div>
+          <p className="text-slate-600 dark:text-slate-400 text-lg mb-4">You need to enroll to watch this video.</p>
+          <Link to={`/courses/${courseId}`} className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg cursor-pointer">
             Go to Course Page
           </Link>
         </div>
@@ -273,22 +292,26 @@ const VideoPlayer = memo(() => {
 
   if (!currentVideo) {
     return (
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="text-center text-sm sm:text-base">Video not found</div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-600 dark:text-slate-400 text-lg">Video not found</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-slate-900">
+      {/* Video Container */}
       <div ref={videoContainerRef} className="relative w-full h-[50vw] sm:h-[45vw] md:h-[40vw] lg:h-[500px] xl:h-[600px] bg-black">
         <div id="youtube-player" className="w-full h-full"></div>
         
-        <div className="absolute top-3 right-3 flex gap-2 z-10">
+        {/* Controls */}
+        <div className="absolute top-4 right-4 flex gap-2 z-10">
           <select
             value={playbackSpeed}
             onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-            className="bg-black/80 text-white text-xs sm:text-sm px-2 py-1.5 rounded backdrop-blur-sm cursor-pointer"
+            className="bg-black/80 text-white text-sm px-3 py-2 rounded-xl backdrop-blur-sm cursor-pointer border border-white/10"
           >
             <option value="0.5">0.5x</option>
             <option value="0.75">0.75x</option>
@@ -300,79 +323,91 @@ const VideoPlayer = memo(() => {
           
           <button
             onClick={toggleFullscreen}
-            className="bg-black/80 text-white p-1.5 sm:p-2 rounded backdrop-blur-sm hover:bg-black/90 cursor-pointer"
+            className="bg-black/80 text-white p-2.5 rounded-xl backdrop-blur-sm hover:bg-black/90 transition cursor-pointer border border-white/10"
             title="Fullscreen"
           >
             {isFullscreen ? (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H5v3a1 1 0 01-2 0V4zm12-1a1 1 0 00-1 1v3a1 1 0 102 0V5h3a1 1 0 100-2h-4zm-9 12a1 1 0 011 1v3h3a1 1 0 110 2H4a1 1 0 01-1-1v-4a1 1 0 011-1zm12 0a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h3v-3a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
+              <Minimize className="w-5 h-5" />
             ) : (
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H5v3a1 1 0 01-2 0V4zm12-1a1 1 0 00-1 1v3a1 1 0 102 0V5h3a1 1 0 100-2h-4zm-9 12a1 1 0 011 1v3h3a1 1 0 110 2H4a1 1 0 01-1-1v-4a1 1 0 011-1zm12 0a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h3v-3a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
+              <Maximize className="w-5 h-5" />
             )}
           </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+      {/* Content Area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Main Content */}
           <div className="flex-1">
-            <div className="mb-4">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{currentVideo.title}</h1>
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base mt-1">Chapter: {currentChapter?.title}</p>
+            {/* Back to Course */}
+            <Link 
+              to={`/courses/${courseId}`}
+              className="inline-flex items-center gap-2 text-slate-400 hover:text-violet-400 text-sm mb-4 transition cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Course
+            </Link>
+
+            {/* Title */}
+            <div className="mb-6">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{currentVideo.title}</h1>
+              <p className="text-slate-400 text-base">Chapter: {currentChapter?.title}</p>
             </div>
             
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-4">
+            {/* Status Buttons */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
               {isWatched && (
-                <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                <span className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-xl text-sm font-medium border border-emerald-500/30">
+                  <CheckCircle className="w-4 h-4" />
                   Completed
                 </span>
               )}
               
               <button
                 onClick={() => setShowRating(!showRating)}
-                className="bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base hover:bg-violet-200 dark:hover:bg-violet-900/50 flex items-center gap-2"
+                className="inline-flex items-center gap-2 bg-violet-600/20 text-violet-400 px-4 py-2 rounded-xl text-sm font-medium border border-violet-600/30 hover:bg-violet-600/30 transition cursor-pointer"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
+                <Star className="w-4 h-4" />
                 Rate Video
               </button>
             </div>
             
+            {/* Rating Section */}
             {showRating && (
-              <div className="mt-4 p-4 bg-violet-50 dark:bg-violet-900/20 rounded-lg">
-                <h3 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Rate this video</h3>
+              <div className="mb-6 p-5 bg-slate-800/50 rounded-2xl border border-slate-700">
+                <h3 className="text-sm font-semibold text-slate-300 mb-3">Rate this video</h3>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       onClick={() => handleRateVideo(star)}
                       disabled={submitting}
-                      className={`p-1 ${userRating >= star ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-400'} transition`}
+                      className={`p-1 transition cursor-pointer ${
+                        userRating >= star 
+                          ? 'text-amber-400' 
+                          : 'text-slate-600 hover:text-amber-400'
+                      }`}
                     >
-                      <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
+                      <Star className="w-8 h-8 fill-current" />
                     </button>
                   ))}
                 </div>
                 {videoRating && (
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                  <p className="text-xs text-slate-500 mt-3">
                     Average: {videoRating.averageRating}/5 ({videoRating.totalRatings} ratings)
                   </p>
                 )}
               </div>
             )}
             
+            {/* Chapter Notes */}
             {currentChapter?.notes && currentChapter.notes.length > 0 && (
-              <div className="mt-4 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Chapter Notes</h3>
+              <div className="mb-6 p-5 bg-blue-900/20 rounded-2xl border border-blue-800/30">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-blue-400 mb-3">
+                  <FileText className="w-4 h-4" />
+                  Chapter Notes
+                </h3>
                 <div className="space-y-2">
                   {currentChapter.notes.map((note, index) => {
                     const isGoogleDrive = note.url?.includes('drive.google.com') || note.url?.includes('docs.google.com');
@@ -382,18 +417,14 @@ const VideoPlayer = memo(() => {
                         href={note.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-violet-600 dark:text-violet-400 hover:underline"
+                        className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition cursor-pointer"
                       >
                         {isGoogleDrive ? (
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1.5 17.5l-4.5-4.5 1.5-1.5 3 3 6-6 1.5 1.5-7.5 7.5z"/>
-                          </svg>
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/></svg>
                         ) : (
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                          </svg>
+                          <FileText className="w-4 h-4" />
                         )}
-                        <span className="text-sm font-medium">{note.title || 'Notes ' + (index + 1)}</span>
+                        <span>{note.title || 'Notes ' + (index + 1)}</span>
                       </a>
                     );
                   })}
@@ -401,67 +432,99 @@ const VideoPlayer = memo(() => {
               </div>
             )}
 
-            <div className="flex flex-wrap gap-3 sm:gap-4 mt-4">
+            {/* Navigation */}
+            <div className="flex flex-wrap gap-3">
               {prevVideo && (
                 <Link
                   to={`/courses/${courseId}/videos/${prevVideo._id}`}
-                  className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base hover:bg-gray-300 dark:hover:bg-gray-600"
+                  className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-3 rounded-xl text-sm font-medium transition cursor-pointer"
                 >
-                  ← Previous
+                  <SkipBack className="w-4 h-4" />
+                  Previous
                 </Link>
               )}
               {nextVideo && (
                 <Link
                   to={`/courses/${courseId}/videos/${nextVideo._id}`}
-                  className="bg-violet-600 text-white px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base hover:bg-violet-700"
+                  className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-xl text-sm font-medium transition hover:shadow-lg cursor-pointer"
                 >
-                  Next →
+                  Next
+                  <SkipForward className="w-4 h-4" />
                 </Link>
               )}
             </div>
           </div>
           
-          <div className="lg:w-80">
+          {/* Sidebar */}
+          <div className="lg:w-96">
+            {/* Toggle Button */}
             <button 
               onClick={() => setShowSidebar(!showSidebar)}
-              className="lg:hidden w-full bg-gray-100 dark:bg-gray-800 p-3 rounded-lg mb-3 text-left flex justify-between items-center"
+              className="lg:hidden w-full flex items-center justify-between p-4 bg-slate-800 rounded-xl mb-3 text-white cursor-pointer"
             >
-              <span className="font-medium text-sm sm:text-base text-gray-900 dark:text-white">Course Content</span>
-              <span className="text-gray-500">{showSidebar ? '▲' : '▼'}</span>
+              <span className="font-semibold">Course Content</span>
+              {showSidebar ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </button>
             
-            <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 ${showSidebar ? 'block' : 'hidden lg:block'}`}>
-              <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Course Content</h2>
-              <div className="space-y-2 max-h-64 sm:max-h-96 overflow-y-auto">
-                {course.chapters?.map((chapter) => (
-                  <div key={chapter._id}>
-                    <h3 className="font-medium text-gray-700 dark:text-gray-300 py-2 border-b dark:border-gray-700 text-sm sm:text-base">
-                      Chapter: {chapter.title}
-                    </h3>
-                    {chapter.videos?.map((video, videoIndex) => (
-                      <Link
-                        key={video._id}
-                        to={`/courses/${courseId}/videos/${video._id}`}
-                        className={`flex items-center p-2 rounded text-xs sm:text-sm ${
-                          video._id === videoId
-                            ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400'
-                            : watchedVideos.includes(video._id)
-                              ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        }`}
+            {/* Course Content List */}
+            <div className={`bg-slate-800 rounded-2xl border border-slate-700 p-4 ${showSidebar ? 'block' : 'hidden lg:block'}`}>
+              <h2 className="text-lg font-bold text-white mb-4">Course Content</h2>
+              
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                {course.chapters?.map((chapter, chapterIndex) => {
+                  const chapterWatched = chapter.videos?.every(v => watchedVideos.includes(v._id));
+                  const isCollapsed = sidebarCollapsed[chapter._id];
+                  
+                  return (
+                    <div key={chapter._id} className="rounded-xl overflow-hidden border border-slate-700">
+                      <button
+                        onClick={() => toggleChapter(chapter._id)}
+                        className="w-full flex items-center justify-between p-4 bg-slate-700/50 hover:bg-slate-700 transition cursor-pointer"
                       >
-                        <span className="mr-1 sm:mr-2">{videoIndex + 1}.</span>
-                        <span className="flex-1 truncate">{video.title}</span>
-                        {video._id === videoId && <span>▶</span>}
-                        {watchedVideos.includes(video._id) && (
-                          <svg className="w-3 h-3 ml-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                ))}
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
+                            chapterWatched 
+                              ? 'bg-emerald-500 text-white' 
+                              : 'bg-violet-600 text-white'
+                          }`}>
+                            {chapterIndex + 1}
+                          </div>
+                          <span className="text-white font-medium text-sm text-left line-clamp-1">
+                            {chapter.title}
+                          </span>
+                        </div>
+                        {chapterWatched && <CheckCircle className="w-5 h-5 text-emerald-500" />}
+                      </button>
+
+                      {!isCollapsed && (
+                        <div className="divide-y divide-slate-700">
+                          {chapter.videos?.map((video, videoIndex) => {
+                            const isCurrentVideo = video._id === videoId;
+                            const isWatchedVideo = watchedVideos.includes(video._id);
+                            
+                            return (
+                              <Link
+                                key={video._id}
+                                to={`/courses/${courseId}/videos/${video._id}`}
+                                className={`flex items-center gap-3 p-3 pl-12 transition cursor-pointer ${
+                                  isCurrentVideo
+                                    ? 'bg-violet-600/20 text-violet-400'
+                                    : isWatchedVideo
+                                      ? 'bg-emerald-900/20 text-emerald-400 hover:bg-emerald-900/30'
+                                      : 'text-slate-400 hover:bg-slate-700/50'
+                                }`}
+                              >
+                                <span className="text-xs w-5">{videoIndex + 1}.</span>
+                                <span className="flex-1 text-sm line-clamp-1">{video.title}</span>
+                                {isWatchedVideo && <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

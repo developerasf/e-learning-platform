@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Save, Plus, Trash2, Upload, FileText, Play, X, ArrowLeft, Loader2, Check, Image, Link2 } from 'lucide-react';
 
 const AdminCourseForm = memo(() => {
   const { id } = useParams();
@@ -18,11 +19,7 @@ const AdminCourseForm = memo(() => {
     chapters: []
   });
   const [newChapter, setNewChapter] = useState('');
-  const [newVideo, setNewVideo] = useState({
-    chapterId: '',
-    title: '',
-    youtubeUrl: ''
-  });
+  const [newVideo, setNewVideo] = useState({ chapterId: '', title: '', youtubeUrl: '' });
   const [showVideoForm, setShowVideoForm] = useState('');
   const [showNotesForm, setShowNotesForm] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -33,17 +30,11 @@ const AdminCourseForm = memo(() => {
   const getYouTubeTitle = async (url) => {
     const videoId = extractVideoId(url);
     if (!videoId) return '';
-    
     try {
       const response = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
       const data = await response.json();
-      if (data.title) {
-        return data.title;
-      }
-    } catch (e) {
-      console.log('Could not fetch YouTube title');
-    }
-    return '';
+      return data.title || '';
+    } catch (e) { return ''; }
   };
 
   const extractVideoId = (url) => {
@@ -56,95 +47,29 @@ const AdminCourseForm = memo(() => {
   const handleYoutubeUrlChange = async (e) => {
     const url = e.target.value;
     const videoId = extractVideoId(url);
-    const chapterId = newVideo.chapterId;
-    
     if (videoId) {
       const title = await getYouTubeTitle(url);
-      setNewVideo({ 
-        ...newVideo, 
-        youtubeUrl: url, 
-        chapterId: chapterId,
-        title: title || `Video ${videoId}` 
-      });
+      setNewVideo({ ...newVideo, youtubeUrl: url, title: title || `Video ${videoId}` });
     } else {
-      setNewVideo({ ...newVideo, youtubeUrl: url, chapterId: chapterId });
-    }
-  };
-
-  const extractDriveFileName = async (url) => {
-    if (!url) return '';
-    
-    try {
-      const response = await fetch(`https://drive.google.com/getvideoplayback?content=${encodeURIComponent(url)}`);
-      // Google Drive doesn't have public oEmbed, so we extract from URL patterns
-    } catch (e) {}
-    
-    // Fallback: create meaningful name from URL
-    if (url.includes('docs.google.com/document/d/')) {
-      const match = url.match(/\/document\/d\/([^\/]+)/);
-      if (match) return 'Document';
-    }
-    if (url.includes('docs.google.com/spreadsheets/d/')) {
-      const match = url.match(/\/spreadsheets\/d\/([^\/]+)/);
-      if (match) return 'Spreadsheet';
-    }
-    if (url.includes('docs.google.com/presentation/d/')) {
-      const match = url.match(/\/presentation\/d\/([^\/]+)/);
-      if (match) return 'Presentation';
-    }
-    if (url.includes('drive.google.com/file/d/')) {
-      const match = url.match(/\/file\/d\/([^\/]+)/);
-      if (match) return 'Drive File';
-    }
-    if (url.includes('drive.google.com/drive/folders/')) {
-      const match = url.match(/\/folders\/([^\/]+)/);
-      if (match) return 'Folder';
-    }
-    
-    return 'Note';
-  };
-
-  const handleNoteUrlChange = async (e, chapterId) => {
-    const url = e.target.value;
-    setNewNoteUrl({ ...newNoteUrl, [chapterId]: url });
-    
-    if (url && !newNoteTitle[chapterId]) {
-      const detectedName = await extractDriveFileName(url);
-      setNewNoteTitle({ ...newNoteTitle, [chapterId]: detectedName });
-    }
-  };
-
-  const handleFileSelect = (e, chapterId) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Get filename without extension
-      const fileName = file.name.replace(/\.[^/.]+$/, '');
-      setNewNoteTitle({ ...newNoteTitle, [chapterId]: fileName });
-      handleUploadNotes(chapterId, file);
+      setNewVideo({ ...newVideo, youtubeUrl: url });
     }
   };
 
   const handleThumbnailUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
     setUploading(true);
     const formData = new FormData();
     formData.append('thumbnail', file);
-    
     const token = localStorage.getItem('token');
-    
     const res = await fetch('/api/upload/thumbnail', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: formData
     });
-    
     if (res.ok) {
       const data = await res.json();
       setCourse({ ...course, thumbnail: data.url });
-    } else {
-      alert('Upload failed');
     }
     setUploading(false);
   };
@@ -154,152 +79,83 @@ const AdminCourseForm = memo(() => {
       alert('Please upload a PDF file');
       return;
     }
-    
     setNotesUploading(true);
     const formData = new FormData();
     formData.append('notes', file);
-    
     const token = localStorage.getItem('token');
-    
     try {
       const res = await fetch('/api/upload/notes', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
-      
       if (res.ok) {
         const data = await res.json();
-        const title = newNoteTitle[chapterId] || 'Notes ' + ((course.chapters?.find(c => c._id === chapterId)?.notes?.length || 0) + 1);
-        
+        const title = newNoteTitle[chapterId] || 'Notes';
         const saveRes = await fetch(`/api/courses/${id}/chapters/${chapterId}/notes`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ title, url: data.url })
         });
-        
         if (saveRes.ok) {
           const updatedCourse = await saveRes.json();
           setCourse(updatedCourse);
-          setNewNoteTitle({ ...newNoteTitle, [chapterId]: '' });
-          alert('Notes uploaded successfully!');
         }
-      } else {
-        alert('Upload failed');
       }
-    } catch (error) {
-      console.error(error);
-      alert('Upload failed');
-    }
+    } catch (error) { console.error(error); }
     setNotesUploading(false);
     setShowNotesForm('');
   };
 
   const handleAddGoogleDriveNote = async (chapterId) => {
     const url = newNoteUrl[chapterId]?.trim();
-    if (!url) {
-      alert('Please enter a Google Drive link');
+    if (!url || !url.includes('drive.google.com') && !url.includes('docs.google.com')) {
+      alert('Please enter a valid Google Drive link');
       return;
     }
-
-    if (!url.includes('drive.google.com') && !url.includes('docs.google.com')) {
-      alert('Please enter a valid Google Drive or Google Docs link');
-      return;
-    }
-
     setNotesUploading(true);
     const token = localStorage.getItem('token');
-    const title = newNoteTitle[chapterId] || 'Notes ' + ((course.chapters?.find(c => c._id === chapterId)?.notes?.length || 0) + 1);
-
+    const title = newNoteTitle[chapterId] || 'Notes';
     try {
       const saveRes = await fetch(`/api/courses/${id}/chapters/${chapterId}/notes`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ title, url })
       });
-
       if (saveRes.ok) {
         const updatedCourse = await saveRes.json();
         setCourse(updatedCourse);
-        setNewNoteTitle({ ...newNoteTitle, [chapterId]: '' });
-        setNewNoteUrl({ ...newNoteUrl, [chapterId]: '' });
-        alert('Google Drive note added successfully!');
-      } else {
-        alert('Failed to add note');
       }
-    } catch (error) {
-      console.error(error);
-      alert('Failed to add note');
-    }
+    } catch (error) { console.error(error); }
     setNotesUploading(false);
     setShowNotesForm('');
   };
 
   useEffect(() => {
-    if (!user || user.role !== 'admin') {
-      navigate('/');
-      return;
-    }
+    if (!user || user.role !== 'admin') { navigate('/'); return; }
     if (id) {
       const token = localStorage.getItem('token');
-      fetch(`/api/courses/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      fetch(`/api/courses/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
         .then(res => res.json())
-        .then(data => {
-          setCourse(data);
-          setLoading(false);
-        });
+        .then(data => { setCourse(data); setLoading(false); });
     }
   }, [id, user, navigate]);
 
   const handleSave = async () => {
-    if (!course.title || !course.description) {
-      alert('Please fill in title and description');
-      return;
-    }
+    if (!course.title || !course.description) { alert('Please fill in title and description'); return; }
     setSaving(true);
     const token = localStorage.getItem('token');
     const url = id ? `/api/courses/${id}` : '/api/courses';
     const method = id ? 'PUT' : 'POST';
-    
-    console.log('Saving course:', { url, method, course });
-    
     const res = await fetch(url, {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(course)
     });
-    
-    console.log('Response:', res.status, res.statusText);
-    
     if (res.ok) {
       const data = await res.json();
-      console.log('Course saved:', data);
-      if (!id) {
-        navigate(`/admin/courses/${data._id}/edit`);
-      } else {
-        setCourse(data);
-        alert('Course saved successfully!');
-      }
-    } else {
-      const text = await res.text();
-      console.error('Error response:', text);
-      try {
-        const error = JSON.parse(text);
-        alert('Error: ' + error.message);
-      } catch (e) {
-        alert('Error: ' + text);
-      }
+      if (!id) navigate(`/admin/courses/${data._id}/edit`);
+      else setCourse(data);
     }
     setSaving(false);
   };
@@ -309,415 +165,281 @@ const AdminCourseForm = memo(() => {
     const token = localStorage.getItem('token');
     const res = await fetch(`/api/courses/${id}/chapters`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ title: newChapter })
     });
-    if (res.ok) {
-      const data = await res.json();
-      setCourse(data);
-      setNewChapter('');
-    }
+    if (res.ok) { const data = await res.json(); setCourse(data); setNewChapter(''); }
   };
 
   const handleDeleteChapter = async (chapterId) => {
-    if (!confirm('Delete this chapter and all its videos?')) return;
+    if (!confirm('Delete this chapter?')) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setCourse(data);
-    }
+    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+    if (res.ok) { const data = await res.json(); setCourse(data); }
   };
 
   const handleAddVideo = async () => {
-    if (!newVideo.youtubeUrl) {
-      alert('Please enter a YouTube URL');
-      return;
-    }
-    
+    if (!newVideo.youtubeUrl) { alert('Please enter a YouTube URL'); return; }
     const token = localStorage.getItem('token');
-    const videoData = {
-      title: newVideo.title || 'Untitled Video',
-      youtubeUrl: newVideo.youtubeUrl
-    };
-    
     const res = await fetch(`/api/courses/${id}/chapters/${newVideo.chapterId}/videos`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(videoData)
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ title: newVideo.title || 'Untitled Video', youtubeUrl: newVideo.youtubeUrl })
     });
-    
-    if (res.ok) {
-      const data = await res.json();
-      setCourse(data);
-      setNewVideo({ chapterId: '', title: '', youtubeUrl: '' });
-      setShowVideoForm('');
-      alert('Video added successfully!');
-    } else {
-      const err = await res.json();
-      alert('Error: ' + err.message);
-    }
+    if (res.ok) { const data = await res.json(); setCourse(data); setNewVideo({ chapterId: '', title: '', youtubeUrl: '' }); setShowVideoForm(''); }
   };
 
   const handleDeleteVideo = async (chapterId, videoId) => {
     if (!confirm('Delete this video?')) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/videos/${videoId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setCourse(data);
-    }
+    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/videos/${videoId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+    if (res.ok) { const data = await res.json(); setCourse(data); }
   };
 
   const handleDeleteSingleNote = async (chapterId, noteId) => {
     if (!confirm('Delete this note?')) return;
     const token = localStorage.getItem('token');
-    
-    try {
-      const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/notes/${noteId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (res.ok) {
-        const updatedCourse = await res.json();
-        setCourse(updatedCourse);
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Failed to delete note');
-    }
-  };
-
-  const handleDeleteNotes = async (chapterId) => {
-    if (!confirm('Delete notes for this chapter?')) return;
-    const token = localStorage.getItem('token');
-    
-    try {
-      const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/notes`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ notes: '' })
-      });
-      
-      if (res.ok) {
-        const updatedCourse = await res.json();
-        setCourse(updatedCourse);
-        alert('Notes deleted successfully!');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Failed to delete notes');
-    }
-    setShowNotesForm('');
+    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/notes/${noteId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+    if (res.ok) { const data = await res.json(); setCourse(data); }
   };
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="text-center text-gray-700 dark:text-gray-300 text-sm sm:text-base">Loading...</div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 text-violet-600 animate-spin mx-auto mb-3" />
+          <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-6 mb-5 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-          {id ? 'Edit Course' : 'Create New Course'}
-        </h1>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 w-full sm:w-auto text-sm sm:text-base"
-        >
-          {saving ? 'Saving...' : 'Save Course'}
-        </button>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
-        <div className="md:col-span-2 space-y-4 sm:space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Course Details</h2>
-            <div className="space-y-3 sm:space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Title</label>
-                <input
-                  type="text"
-                  value={course.title}
-                  onChange={e => setCourse({ ...course, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Course title"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Description</label>
-                <textarea
-                  value={course.description}
-                  onChange={e => setCourse({ ...course, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white h-24"
-                  placeholder="Course description"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Thumbnail Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleThumbnailUpload}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                {uploading && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Uploading...</p>}
-                {course.thumbnail && (
-                  <div className="mt-2">
-                    <img src={course.thumbnail} alt="Thumbnail" className="h-20 w-auto rounded" />
-                    <button
-                      type="button"
-                      onClick={() => setCourse({ ...course, thumbnail: '' })}
-                      className="text-red-600 text-sm mt-1 block"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Price (BDT)</label>
-                <input
-                  type="number"
-                  value={course.price}
-                  onChange={e => setCourse({ ...course, price: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Category</label>
-                <select
-                  value={course.category}
-                  onChange={e => setCourse({ ...course, category: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="default">Default</option>
-                  <option value="latest">Latest</option>
-                  <option value="popular">Popular</option>
-                </select>
-              </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div className="flex items-center gap-4">
+            <Link to="/admin" className="p-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition cursor-pointer">
+              <ArrowLeft className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                {id ? 'Edit Course' : 'Create New Course'}
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Fill in course details and add content</p>
             </div>
           </div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg disabled:opacity-50 cursor-pointer"
+          >
+            {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+            {saving ? 'Saving...' : 'Save Course'}
+          </button>
+        </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Chapters</h2>
-            <div className="flex gap-2 mb-4">
-              <input
-                type="text"
-                value={newChapter}
-                onChange={e => setNewChapter(e.target.value)}
-                placeholder="Chapter title"
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-              <button
-                onClick={handleAddChapter}
-                disabled={!id || !newChapter.trim()}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
-              >
-                Add Chapter
-              </button>
-            </div>
-            {!id && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Save course first before adding chapters.</p>
-            )}
-            <div className="space-y-4">
-              {course.chapters?.map((chapter, index) => (
-                <div key={chapter._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
-                    <h3 className="font-medium text-sm sm:text-base text-gray-900 dark:text-white">
-                      Chapter: {chapter.title}
-                    </h3>
-                    <div className="flex gap-2 flex-wrap">
-                      <button
-                        onClick={() => setShowNotesForm(showNotesForm === chapter._id ? '' : chapter._id)}
-                        className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-green-200 dark:hover:bg-green-900/50 transition"
-                      >
-                        + Add Notes
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowVideoForm(chapter._id);
-                          setNewVideo({ ...newVideo, chapterId: chapter._id });
-                        }}
-                        className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-900/50 transition"
-                      >
-                        + Add Video
-                      </button>
-                      <button
-                        onClick={() => handleDeleteChapter(chapter._id)}
-                        className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition"
-                      >
-                        Delete
-                      </button>
-                    </div>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Course Details */}
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-6">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-violet-600" />
+                Course Details
+              </h2>
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Title</label>
+                  <input
+                    type="text"
+                    value={course.title}
+                    onChange={e => setCourse({ ...course, title: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                    placeholder="Course title"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Description</label>
+                  <textarea
+                    value={course.description}
+                    onChange={e => setCourse({ ...course, description: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white h-32 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                    placeholder="Course description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Thumbnail</label>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 px-4 py-3 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 rounded-xl cursor-pointer hover:bg-violet-200 dark:hover:bg-violet-900/50 transition cursor-pointer">
+                      <Upload className="w-5 h-5" />
+                      <span className="font-medium">Upload Image</span>
+                      <input type="file" accept="image/*" onChange={handleThumbnailUpload} className="hidden" />
+                    </label>
+                    {course.thumbnail && (
+                      <div className="relative">
+                        <img src={course.thumbnail} alt="Thumbnail" className="h-16 w-24 object-cover rounded-xl" />
+                        <button onClick={() => setCourse({ ...course, thumbnail: '' })} className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full cursor-pointer">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Price (BDT)</label>
+                    <input
+                      type="number"
+                      value={course.price}
+                      onChange={e => setCourse({ ...course, price: Number(e.target.value) })}
+                      className="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Category</label>
+                    <select
+                      value={course.category}
+                      onChange={e => setCourse({ ...course, category: e.target.value })}
+                      className="w-full px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"
+                    >
+                      <option value="default">Default</option>
+                      <option value="latest">Latest</option>
+                      <option value="popular">Popular</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                  {/* Show existing notes */}
-                  {chapter.notes && chapter.notes.length > 0 && (
-                    <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Uploaded Notes:</p>
-                      <div className="space-y-2">
-                        {chapter.notes.map((note, noteIndex) => (
-                          <div key={noteIndex} className="flex justify-between items-center bg-white dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-600">
-                            <span className="text-sm text-gray-700 dark:text-gray-300 truncate flex-1 mr-2">{note.title || 'Notes ' + (noteIndex + 1)}</span>
-                            <button
-                              onClick={() => handleDeleteSingleNote(chapter._id, note._id)}
-                              className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs font-medium hover:bg-red-200 dark:hover:bg-red-900/50"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {showNotesForm === chapter._id && (
-                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg mb-3 border border-green-200 dark:border-green-800">
-                      <div className="mb-3">
-                        <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Notes Title</label>
-                        <input
-                          type="text"
-                          placeholder="e.g., Lecture Notes, Summary, Exercise"
-                          value={newNoteTitle[chapter._id] || ''}
-                          onChange={(e) => setNewNoteTitle({ ...newNoteTitle, [chapter._id]: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                        />
-                      </div>
+            {/* Chapters */}
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-6">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+                <Play className="w-5 h-5 text-emerald-500" />
+                Chapters & Videos
+              </h2>
+              
+              {/* Add Chapter */}
+              <div className="flex gap-3 mb-6">
+                <input
+                  type="text"
+                  value={newChapter}
+                  onChange={e => setNewChapter(e.target.value)}
+                  placeholder="Chapter title"
+                  className="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"
+                />
+                <button
+                  onClick={handleAddChapter}
+                  disabled={!id || !newChapter.trim()}
+                  className="px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium disabled:opacity-50 transition cursor-pointer"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+              {!id && <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">⚠️ Save course first before adding chapters.</p>}
 
-                      <div className="space-y-4">
-                        {/* PDF Upload Option */}
-                        <div>
-                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Option 1: Upload PDF (auto-detects filename)</label>
-                          <input
-                            type="file"
-                            accept="application/pdf"
-                            onChange={(e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                const fileName = file.name.replace(/\.[^/.]+$/, '');
-                                setNewNoteTitle({ ...newNoteTitle, [chapter._id]: fileName });
-                                handleUploadNotes(chapter._id, file);
-                              }
-                            }}
-                            disabled={notesUploading}
-                            className="w-full text-sm text-gray-700 dark:text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-violet-100 dark:file:bg-violet-900 file:text-violet-700 dark:file:text-violet-300 file:cursor-pointer file:transition file:hover:bg-violet-200 dark:file:hover:bg-violet-800"
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-center">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">OR</span>
-                        </div>
-
-                        {/* Google Drive Link Option */}
-                        <div>
-                          <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Option 2: Google Drive Link (auto-detects name)</label>
-                          <div className="flex gap-2">
-                            <input
-                              type="url"
-                              placeholder="Paste Google Drive or Docs link here..."
-                              value={newNoteUrl[chapter._id] || ''}
-                              onChange={(e) => handleNoteUrlChange(e, chapter._id)}
-                              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                            />
-                            <button
-                              onClick={() => handleAddGoogleDriveNote(chapter._id)}
-                              disabled={notesUploading}
-                              className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-medium disabled:opacity-50 transition"
-                            >
-                              Add
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {notesUploading && <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Processing...</p>}
-                    </div>
-                  )}
-
-                  {showVideoForm === chapter._id && (
-                    <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded mb-3">
-                      <input
-                        type="text"
-                        placeholder="Video title (auto-detected from YouTube)"
-                        value={newVideo.title}
-                        onChange={e => setNewVideo({ ...newVideo, title: e.target.value, chapterId: chapter._id })}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      />
-                      <input
-                        type="text"
-                        placeholder="YouTube URL (auto-detects video title)"
-                        value={newVideo.youtubeUrl}
-                        onChange={handleYoutubeUrlChange}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      />
-                      <button
-                        onClick={handleAddVideo}
-                        disabled={!newVideo.youtubeUrl}
-                        className="bg-blue-600 text-white px-4 py-1 rounded text-sm disabled:opacity-50"
-                      >
-                        Add Video
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    {chapter.videos?.map((video, vIndex) => (
-                      <div key={video._id} className="flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
-                        <span className="text-sm text-gray-700 dark:text-gray-300">
-                          {index + 1}.{vIndex + 1} {video.title}
-                        </span>
-                        <button
-                          onClick={() => handleDeleteVideo(chapter._id, video._id)}
-                          className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs font-medium hover:bg-red-200 dark:hover:bg-red-900/50"
-                        >
+              {/* Chapter List */}
+              <div className="space-y-4">
+                {course.chapters?.map((chapter, index) => (
+                  <div key={chapter._id} className="border border-slate-200 dark:border-slate-600 rounded-xl overflow-hidden">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-4 bg-slate-50 dark:bg-slate-700/50">
+                      <h3 className="font-semibold text-slate-900 dark:text-white">
+                        {index + 1}. {chapter.title}
+                      </h3>
+                      <div className="flex gap-2 flex-wrap">
+                        <button onClick={() => setShowNotesForm(showNotesForm === chapter._id ? '' : chapter._id)} className="px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-sm font-medium hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition cursor-pointer">
+                          + Notes
+                        </button>
+                        <button onClick={() => { setShowVideoForm(chapter._id); setNewVideo({ ...newVideo, chapterId: chapter._id }); }} className="px-3 py-1.5 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 rounded-lg text-sm font-medium hover:bg-violet-200 dark:hover:bg-violet-900/50 transition cursor-pointer">
+                          + Video
+                        </button>
+                        <button onClick={() => handleDeleteChapter(chapter._id)} className="px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition cursor-pointer">
                           Delete
                         </button>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Notes Section */}
+                    {chapter.notes?.length > 0 && (
+                      <div className="p-4 border-t border-slate-200 dark:border-slate-600">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Notes:</p>
+                        <div className="space-y-2">
+                          {chapter.notes.map((note, i) => (
+                            <div key={i} className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 p-2 rounded-lg">
+                              <span className="text-sm text-slate-700 dark:text-slate-300 truncate flex-1">{note.title}</span>
+                              <button onClick={() => handleDeleteSingleNote(chapter._id, note._id)} className="text-red-500 hover:text-red-700 text-xs ml-2 cursor-pointer">Delete</button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {showNotesForm === chapter._id && (
+                      <div className="p-4 border-t border-slate-200 dark:border-slate-600 bg-emerald-50 dark:bg-emerald-900/20">
+                        <div className="mb-3">
+                          <input type="text" placeholder="Note title" value={newNoteTitle[chapter._id] || ''} onChange={(e) => setNewNoteTitle({ ...newNoteTitle, [chapter._id]: e.target.value })} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900" />
+                        </div>
+                        <div className="flex gap-2">
+                          <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg text-sm cursor-pointer">
+                            <Upload className="w-4 h-4" />
+                            PDF
+                            <input type="file" accept="application/pdf" className="hidden" onChange={(e) => { if (e.target.files[0]) { setNewNoteTitle({ ...newNoteTitle, [chapter._id]: e.target.files[0].name.replace(/\.[^/.]+$/, '') }); handleUploadNotes(chapter._id, e.target.files[0]); } }} />
+                          </label>
+                          <span className="flex items-center text-slate-400 text-sm">or</span>
+                          <div className="flex-1 flex gap-2">
+                            <input type="url" placeholder="Drive link..." value={newNoteUrl[chapter._id] || ''} onChange={(e) => setNewNoteUrl({ ...newNoteUrl, [chapter._id]: e.target.value })} className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900" />
+                            <button onClick={() => handleAddGoogleDriveNote(chapter._id)} className="px-3 py-2 bg-violet-600 text-white rounded-lg text-sm cursor-pointer">Add</button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Video Form */}
+                    {showVideoForm === chapter._id && (
+                      <div className="p-4 border-t border-slate-200 dark:border-slate-600 bg-violet-50 dark:bg-violet-900/20">
+                        <input type="text" placeholder="Video title" value={newVideo.title} onChange={e => setNewVideo({ ...newVideo, title: e.target.value })} className="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900 mb-2" />
+                        <div className="flex gap-2">
+                          <input type="url" placeholder="YouTube URL" value={newVideo.youtubeUrl} onChange={handleYoutubeUrlChange} className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-900" />
+                          <button onClick={handleAddVideo} disabled={!newVideo.youtubeUrl} className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm disabled:opacity-50 cursor-pointer">Add</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Videos List */}
+                    <div className="p-4 border-t border-slate-200 dark:border-slate-600 space-y-2">
+                      {chapter.videos?.map((video, vIndex) => (
+                        <div key={video._id} className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 p-2 rounded-lg">
+                          <span className="text-sm text-slate-700 dark:text-slate-300 truncate flex-1">{index + 1}.{vIndex + 1} {video.title}</span>
+                          <button onClick={() => handleDeleteVideo(chapter._id, video._id)} className="text-red-500 hover:text-red-700 text-xs ml-2 cursor-pointer">Delete</button>
+                        </div>
+                      ))}
+                      {chapter.videos?.length === 0 && <p className="text-sm text-slate-400">No videos yet</p>}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="md:col-span-1">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sticky top-4">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Preview</h2>
-            {course.thumbnail && (
-              <img src={course.thumbnail} alt="Preview" className="w-full h-40 object-cover rounded mb-4" />
-            )}
-            <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">{course.title || 'Course Title'}</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{course.description || 'Course description...'}</p>
-            <p className="text-blue-600 dark:text-blue-400 font-bold">
-              {course.price === 0 ? 'Free' : `BDT ${course.price}`}
-            </p>
-            <div className="mt-4">
-              <span className={`px-2 py-1 text-xs rounded ${course.isPublished ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
-                {course.isPublished ? 'Published' : 'Draft'}
-              </span>
+          {/* Sidebar - Preview */}
+          <div className="lg:col-span-1">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-6 sticky top-4">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+                <Image className="w-5 h-5 text-violet-600" />
+                Preview
+              </h2>
+              {course.thumbnail && (
+                <img src={course.thumbnail} alt="Preview" className="w-full h-40 object-cover rounded-xl mb-4" />
+              )}
+              <h3 className="font-bold text-xl mb-2 text-slate-900 dark:text-white">{course.title || 'Course Title'}</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mb-3">{course.description || 'Course description...'}</p>
+              <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg mb-4">{course.price === 0 ? 'Free' : `BDT ${course.price}`}</p>
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${course.isPublished ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'}`}>
+                  {course.isPublished ? 'Published' : 'Draft'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
