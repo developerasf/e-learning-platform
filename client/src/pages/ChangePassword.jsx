@@ -45,9 +45,9 @@ const ChangePassword = memo(() => {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-8 sm:py-16">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">Change Password</h2>
+    <div className="max-w-lg mx-auto px-4 py-8 sm:py-12 md:py-16">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8 md:p-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 dark:text-white">Change Password</h2>
         
         {success && (
           <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 text-green-700 dark:text-green-300 px-4 py-3 rounded mb-4 text-sm sm:text-base">
@@ -62,34 +62,34 @@ const ChangePassword = memo(() => {
         )}
         
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
+          <div className="mb-5 sm:mb-6">
             <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Current Password</label>
             <input
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
               required
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-5 sm:mb-6">
             <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">New Password</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
               required
               minLength={6}
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-6 sm:mb-8">
             <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Confirm New Password</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
               required
               minLength={6}
             />
@@ -97,7 +97,7 @@ const ChangePassword = memo(() => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 dark:bg-blue-600 text-white py-2 sm:py-3 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+            className="w-full bg-blue-600 dark:bg-blue-600 text-white py-3 sm:py-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-base sm:text-lg font-medium"
           >
             {loading ? 'Changing...' : 'Change Password'}
           </button>

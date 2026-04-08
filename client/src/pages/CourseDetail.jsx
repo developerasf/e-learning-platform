@@ -120,21 +120,21 @@ const CourseDetail = memo(() => {
   const enrolled = isUserEnrolled;
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-        <div className="h-48 sm:h-64 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+    <div className="max-w-full mx-auto px-2 sm:px-4 py-4 sm:py-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mx-1 sm:mx-0">
+        <div className="h-40 sm:h-56 md:h-72 lg:h-80 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
           {course.thumbnail ? (
             <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
           ) : (
-            <span className="text-6xl sm:text-8xl text-gray-400 dark:text-gray-500">📚</span>
+            <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-gray-400 dark:text-gray-500">📚</span>
           )}
         </div>
-        <div className="p-4 sm:p-8">
-          <h1 className="text-xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">{course.title}</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base">{course.description}</p>
+        <div className="p-4 sm:p-6 md:p-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">{course.title}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4 sm:mb-5 text-sm sm:text-base md:text-lg">{course.description}</p>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6 mb-5 sm:mb-6">
             <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">By {course.createdBy?.name || 'Unknown'}</span>
-            <span className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">
               {course.price === 0 ? 'Free' : `BDT ${course.price}`}
             </span>
           </div>
@@ -143,14 +143,14 @@ const CourseDetail = memo(() => {
             <button
               onClick={handleEnroll}
               disabled={enrolling}
-              className="bg-blue-600 dark:bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-lg hover:bg-blue-700 dark:hover:bg-blue-700 transition w-full sm:w-auto disabled:opacity-50"
+              className="bg-blue-600 dark:bg-blue-600 text-white px-6 sm:px-10 py-3 sm:py-4 rounded-lg text-base sm:text-lg md:text-xl hover:bg-blue-700 dark:hover:bg-blue-700 transition w-full sm:w-auto disabled:opacity-50"
             >
               {enrolling ? 'Sending...' : 'Enroll Now'}
             </button>
           )}
 
           {enrollmentStatus === 'pending' && (
-            <div className="text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-lg w-full sm:w-auto text-center">
+            <div className="text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 px-6 sm:px-10 py-3 sm:py-4 rounded-lg text-base sm:text-lg md:text-xl w-full sm:w-auto text-center">
               Requested - Waiting for Approval
             </div>
           )}
@@ -158,7 +158,7 @@ const CourseDetail = memo(() => {
           {enrolled && (
             <Link
               to={`/courses/${course._id}/videos/${course.chapters[0]?.videos[0]?._id || ''}`}
-              className="bg-green-600 dark:bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-lg hover:bg-green-700 dark:hover:bg-green-700 transition inline-block w-full sm:w-auto text-center"
+              className="bg-green-600 dark:bg-green-600 text-white px-6 sm:px-10 py-3 sm:py-4 rounded-lg text-base sm:text-lg md:text-xl hover:bg-green-700 dark:hover:bg-green-700 transition inline-block w-full sm:w-auto text-center"
             >
               Start Learning
             </Link>
@@ -166,16 +166,16 @@ const CourseDetail = memo(() => {
         </div>
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-900 dark:text-white">Course Content</h2>
+      <div className="mt-6 sm:mt-8 md:mt-10 px-1 sm:px-0">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-5 md:mb-6 text-gray-900 dark:text-white">Course Content</h2>
         {course.chapters?.length === 0 ? (
           <p className="text-gray-600 dark:text-gray-400">No chapters added yet.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 sm:space-y-5">
             {course.chapters?.map((chapter, chapterIndex) => (
-              <div key={chapter._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+              <div key={chapter._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-5 md:p-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
                     Chapter: {chapter.title}
                   </h3>
                 </div>

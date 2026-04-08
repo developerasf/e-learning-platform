@@ -85,9 +85,9 @@ const ForgotPassword = memo(() => {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-8 sm:py-16">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sm:p-8">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+    <div className="max-w-lg mx-auto px-4 py-8 sm:py-12 md:py-16">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8 md:p-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 dark:text-white">
           {step === 1 ? 'Forgot Password' : 'Reset Password'}
         </h2>
         
@@ -105,13 +105,13 @@ const ForgotPassword = memo(() => {
         
         {step === 1 ? (
           <form onSubmit={handleSendOTP}>
-            <div className="mb-6">
+            <div className="mb-6 sm:mb-8">
               <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 placeholder="yourname@gmail.com"
                 required
               />
@@ -120,14 +120,14 @@ const ForgotPassword = memo(() => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 dark:bg-blue-600 text-white py-2 sm:py-3 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+              className="w-full bg-blue-600 dark:bg-blue-600 text-white py-3 sm:py-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-base sm:text-lg font-medium"
             >
               {loading ? 'Sending...' : 'Send Reset Code'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleReset}>
-            <div className="mb-4">
+            <div className="mb-5 sm:mb-6">
               <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm sm:text-base">
                 Enter the code sent to<br />
                 <span className="font-semibold text-blue-600 dark:text-blue-400">{email}</span>
@@ -137,31 +137,31 @@ const ForgotPassword = memo(() => {
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl tracking-widest font-mono text-sm sm:text-base"
+                className="w-full px-4 py-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center text-xl tracking-widest font-mono text-sm sm:text-base"
                 placeholder="000000"
                 maxLength={6}
                 required
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-5 sm:mb-6">
               <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">New Password</label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 placeholder="Min 6 characters"
                 required
                 minLength={6}
               />
             </div>
-            <div className="mb-6">
+            <div className="mb-6 sm:mb-8">
               <label className="block text-gray-700 dark:text-gray-300 mb-2 text-sm sm:text-base">Confirm Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
                 placeholder="Confirm password"
                 required
                 minLength={6}
@@ -170,11 +170,11 @@ const ForgotPassword = memo(() => {
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="w-full bg-blue-600 dark:bg-blue-600 text-white py-2 sm:py-3 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+              className="w-full bg-blue-600 dark:bg-blue-600 text-white py-3 sm:py-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50 text-base sm:text-lg font-medium"
             >
               {loading ? 'Resetting...' : 'Reset Password'}
             </button>
-            <div className="mt-4 text-center">
+            <div className="mt-5 sm:mt-6 text-center">
               {resendTimer > 0 ? (
                 <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Resend code in {resendTimer}s</p>
               ) : (
