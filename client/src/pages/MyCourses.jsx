@@ -26,7 +26,10 @@ const MyCourses = memo(() => {
         }
       });
       const data = await res.json();
-      setCourses(data.enrolledCourses || []);
+      console.log('Profile data:', data);
+      if (data.enrolledCourses) {
+        setCourses(data.enrolledCourses);
+      }
     } catch (error) {
       console.error('Error fetching courses:', error);
     } finally {

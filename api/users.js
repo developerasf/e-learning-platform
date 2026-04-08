@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         status: 'approved'
       }).populate({
         path: 'course',
-        select: 'title description thumbnail createdBy',
+        select: 'title description thumbnail createdBy chapters',
         populate: { path: 'createdBy', select: 'name' }
       });
 
