@@ -3,6 +3,7 @@ import Course from './_models/Course.js';
 import Enrollment from './_models/Enrollment.js';
 import Attendance from './_models/Attendance.js';
 import Result from './_models/Result.js';
+import Payment from './_models/Payment.js';
 import { protect, admin } from './_middleware/auth.js';
 import connectDB from './_lib/db.js';
 
@@ -158,11 +159,33 @@ export default async function handler(req, res) {
 
       const resultsSummary = Object.values(resultsGrouped);
 
+      // Fetch last month's payment status
+      const currentDate = new Date();
+      let lastMonth = currentDate.getMonth(); // 0-based month equals 1-based previous month
+      let lastYear = currentDate.getFullYear();
+      if (lastMonth === 0) {
+        lastMonth = 12;
+        lastYear -= 1;
+      }
+      
+      const lastMonthPaymentRec = await Payment.findOne({
+        student: user._id,
+        month: lastMonth,
+        year: lastYear
+      });
+
+      const paymentStatus = lastMonthPaymentRec ? lastMonthPaymentRec.status : 'unpaid';
+
       return res.json({
         user,
         enrolledCourses: coursesWithProgress,
         attendanceSummary,
-        resultsSummary
+        resultsSummary,
+        lastMonthPayment: {
+          status: paymentStatus,
+          month: lastMonth,
+          year: lastYear
+        }
       });
     }
 

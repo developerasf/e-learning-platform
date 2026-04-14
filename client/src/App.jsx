@@ -30,6 +30,7 @@ const AdminAttendance = lazy(() => import("./pages/AdminAttendance"));
 const AdminCourseAttendance = lazy(() => import("./pages/AdminCourseAttendance"));
 const AdminResults = lazy(() => import("./pages/AdminResults"));
 const AdminCourseResults = lazy(() => import("./pages/AdminCourseResults"));
+const AdminPayments = lazy(() => import("./pages/AdminPayments"));
 
 const Loading = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -101,6 +102,7 @@ function App() {
                   path="/admin/results/:courseId"
                   element={<AdminCourseResults />}
                 />
+                <Route path="/admin/payments" element={<AdminPayments />} />
               </Routes>
             </Suspense>
             <Footer />

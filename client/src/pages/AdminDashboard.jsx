@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Settings, Users, FileText, Plus, Upload, Image, Trash2, Edit, Eye, EyeOff, CheckCircle, Clock, BarChart3, BookOpen, Loader2 } from 'lucide-react';
+import { Settings, Users, FileText, Plus, Upload, Image, Trash2, Edit, Eye, EyeOff, CheckCircle, Clock, BarChart3, BookOpen, Loader2, CreditCard } from 'lucide-react';
 
 const AdminDashboard = memo(() => {
   const [courses, setCourses] = useState([]);
@@ -132,6 +132,13 @@ const AdminDashboard = memo(() => {
             >
               <Users className="w-4 h-4" />
               Users
+            </Link>
+            <Link
+              to="/admin/payments"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-lg cursor-pointer"
+            >
+              <CreditCard className="w-4 h-4" />
+              Payments
             </Link>
             <Link
               to="/admin/courses/new"

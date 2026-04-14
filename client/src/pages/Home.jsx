@@ -3,16 +3,10 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Video, Award, ArrowRight, Users, Star, Play } from 'lucide-react';
 
 const Home = memo(() => {
-  const [banner, setBanner] = useState('');
-  const [courses, setCourses] = useState([]);
-
   useEffect(() => {
-    Promise.all([
-      fetch('/api/upload/banner').then(r => r.json()),
-      fetch('/api/courses?page=1&limit=6').then(r => r.json())
-    ])
-      .then(([bannerData, coursesData]) => {
-        if (bannerData.url) setBanner(bannerData.url);
+    fetch('/api/courses?page=1&limit=6')
+      .then(r => r.json())
+      .then((coursesData) => {
         const courses = coursesData.courses || coursesData;
         setCourses(courses.slice(0, 6));
       })
@@ -48,35 +42,27 @@ const Home = memo(() => {
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-50 via-white to-emerald-50/30" />
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 right-20 w-72 h-72 bg-violet-200 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-emerald-200 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-900 via-violet-800 to-violet-600" />
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-20 right-20 w-72 h-72 bg-violet-400 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-emerald-400 rounded-full blur-3xl" />
         </div>
-        
-        {/* Banner Image */}
-        {banner && (
-          <div className="absolute inset-0 z-0">
-            <img src={banner} alt="Banner" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-900/80 to-violet-600/60" />
-          </div>
-        )}
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className={`max-w-3xl ${banner ? 'text-white' : ''}`}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-6">
-              <Star className="w-4 h-4 fill-violet-500" />
+          <div className="max-w-3xl text-white">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6">
+              <Star className="w-4 h-4 fill-emerald-400 text-emerald-400" />
               Start Your Learning Journey
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               Welcome to{' '}
-              <span className={`${banner ? 'text-emerald-400' : 'text-violet-600'}`}>
+              <span className="text-emerald-400">
                 Bipul's Classroom
               </span>
             </h1>
             
-            <p className={`text-lg sm:text-xl mb-8 max-w-2xl ${banner ? 'text-violet-100' : 'text-slate-600 dark:text-slate-300'}`}>
+            <p className="text-lg sm:text-xl mb-8 max-w-2xl text-violet-100">
               Unlock your potential with expert-led video courses. Learn at your own pace, anywhere, anytime.
             </p>
             
@@ -90,43 +76,39 @@ const Home = memo(() => {
               </Link>
               <Link
                 to="/register"
-                className={`inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-1 cursor-pointer ${
-                  banner 
-                    ? 'bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm' 
-                    : 'bg-white border-2 border-violet-600 text-violet-600 hover:bg-violet-50'
-                }`}
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-1 cursor-pointer bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
               >
                 Get Started
               </Link>
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-8 mt-12 pt-8 border-t border-slate-200/50">
+            <div className="flex flex-wrap gap-8 mt-12 pt-8 border-t border-white/20">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-violet-600" />
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Users className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className={`text-2xl font-bold ${banner ? 'text-white' : 'text-slate-900 dark:text-white'}`}>10K+</div>
-                  <div className={`text-sm ${banner ? 'text-violet-100' : 'text-slate-500 dark:text-slate-400'}`}>Students</div>
+                  <div className="text-2xl font-bold text-white">10K+</div>
+                  <div className="text-sm text-violet-100">Students</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-emerald-600" />
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className={`text-2xl font-bold ${banner ? 'text-white' : 'text-slate-900 dark:text-white'}`}>50+</div>
-                  <div className={`text-sm ${banner ? 'text-violet-100' : 'text-slate-500 dark:text-slate-400'}`}>Courses</div>
+                  <div className="text-2xl font-bold text-white">50+</div>
+                  <div className="text-sm text-violet-100">Courses</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                  <Award className="w-6 h-6 text-amber-600" />
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Award className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className={`text-2xl font-bold ${banner ? 'text-white' : 'text-slate-900 dark:text-white'}`}>5K+</div>
-                  <div className={`text-sm ${banner ? 'text-violet-100' : 'text-slate-500 dark:text-slate-400'}`}>Certificates</div>
+                  <div className="text-2xl font-bold text-white">5K+</div>
+                  <div className="text-sm text-violet-100">Certificates</div>
                 </div>
               </div>
             </div>
@@ -229,13 +211,13 @@ const Home = memo(() => {
                     <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2">
                       {course.description}
                     </p>
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-sm mb-4">
                       <span className="text-slate-500 dark:text-slate-500">
-                        By {course.createdBy?.name || 'Unknown'}
+                        By <span className="font-medium text-slate-700 dark:text-slate-300">{course.createdBy?.name || 'Unknown'}</span>
                       </span>
-                      <span className="inline-flex items-center gap-1 text-violet-600 dark:text-violet-400 font-medium">
-                        Learn More <ArrowRight className="w-4 h-4" />
-                      </span>
+                    </div>
+                    <div className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold transition-all duration-200 hover:shadow-md cursor-pointer">
+                      Enroll Now <ArrowRight className="w-5 h-5" />
                     </div>
                   </div>
                 </Link>

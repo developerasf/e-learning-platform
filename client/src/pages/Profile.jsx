@@ -97,6 +97,25 @@ const Profile = memo(() => {
                     </>
                   )}
                 </div>
+                {profile?.lastMonthPayment && (
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                    profile.lastMonthPayment.status === 'paid' 
+                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' 
+                      : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                  }`}>
+                    {profile.lastMonthPayment.status === 'paid' ? (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        Prev. Month: Paid
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-4 h-4" />
+                        Prev. Month: Unpaid
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

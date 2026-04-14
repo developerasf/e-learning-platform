@@ -10,6 +10,14 @@ const Courses = memo(() => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [banner, setBanner] = useState('');
+
+  useEffect(() => {
+    fetch('/api/upload/banner')
+      .then(r => r.json())
+      .then(data => data.url && setBanner(data.url))
+      .catch(console.error);
+  }, []);
 
   const fetchCourses = async (pageNum = 1, searchTerm = search, cat = category) => {
     setLoading(true);
@@ -142,6 +150,13 @@ const Courses = memo(() => {
           )}
         </form>
 
+        {/* Banner Section */}
+        {banner && (
+          <div className="mb-12 w-full aspect-video sm:aspect-[16/9] rounded-2xl overflow-hidden shadow-xl border border-slate-100 dark:border-slate-800">
+            <img src={banner} alt="Banner" className="w-full h-full object-cover" />
+          </div>
+        )}
+
         {/* Results */}
         {loading ? (
           <div className="text-center py-20">
@@ -215,13 +230,13 @@ const Courses = memo(() => {
                     <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2">
                       {course.description}
                     </p>
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700 mb-4">
                       <span className="text-sm text-slate-500 dark:text-slate-500">
                         By <span className="font-medium text-slate-700 dark:text-slate-300">{course.createdBy?.name || 'Unknown'}</span>
                       </span>
-                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold text-sm group-hover:translate-x-1 transition">
-                        View Course
-                      </span>
+                    </div>
+                    <div className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold transition-all duration-200 hover:shadow-md cursor-pointer">
+                      Enroll Now
                     </div>
                   </div>
                 </Link>
