@@ -1,8 +1,8 @@
+import { BarChart3, BookOpen, ChevronDown, LogOut, Menu, Moon, Settings, Sun, User, X } from 'lucide-react';
 import { memo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Menu, X, Sun, Moon, ChevronDown, BookOpen, BarChart3, User, LogOut, Settings } from 'lucide-react';
 
 const Navbar = memo(() => {
   const { user, logout } = useAuth();
@@ -24,20 +24,16 @@ const Navbar = memo(() => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center gap-3 group"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-violet-700 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <BookOpen className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-slate-800 dark:text-white hidden sm:block">
-              Bipul's Classroom
-            </span>
+            <img src="/logo.png" alt="Bipul's Classroom" className="h-10 w-auto" />
+
           </Link>
-          
+
           {/* Mobile menu button */}
-          <button 
+          <button
             className="md:hidden inline-flex items-center justify-center p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
             onClick={() => setShowMobileMenu(!showMobileMenu)}
             aria-expanded={showMobileMenu}
@@ -49,7 +45,7 @@ const Navbar = memo(() => {
               <Menu className="w-6 h-6 text-slate-600 dark:text-slate-300" />
             )}
           </button>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:gap-2">
             <Link to="/courses" className={navLinkClass}>
@@ -65,6 +61,12 @@ const Navbar = memo(() => {
                     <Link to="/admin/tracking" className={navLinkClass}>
                       Tracking
                     </Link>
+                    <Link to="/admin/attendance" className={navLinkClass}>
+                      Attendance
+                    </Link>
+                    <Link to="/admin/results" className={navLinkClass}>
+                      Results
+                    </Link>
                   </>
                 )}
                 {user.role === 'student' && (
@@ -77,7 +79,7 @@ const Navbar = memo(() => {
                     </Link>
                   </>
                 )}
-                <button 
+                <button
                   onClick={toggleTheme}
                   className="inline-flex items-center justify-center p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer"
                   title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -90,7 +92,7 @@ const Navbar = memo(() => {
                   )}
                 </button>
                 <div className="relative ml-2">
-                  <button 
+                  <button
                     onClick={() => setShowUserDropdown(!showUserDropdown)}
                     className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                     aria-expanded={showUserDropdown}
@@ -102,7 +104,7 @@ const Navbar = memo(() => {
                     <span className="hidden lg:inline text-slate-700 dark:text-slate-300 font-medium">{user.name}</span>
                     <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${showUserDropdown ? 'rotate-180' : ''}`} />
                   </button>
-                  
+
                   {showUserDropdown && (
                     <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-2 z-50 overflow-hidden">
                       <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
@@ -112,8 +114,8 @@ const Navbar = memo(() => {
                       <div className="py-2">
                         {user.role === 'admin' && (
                           <>
-                            <Link 
-                              to="/admin" 
+                            <Link
+                              to="/admin"
                               className="flex items-center gap-3 px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 text-sm transition"
                               onClick={() => setShowUserDropdown(false)}
                             >
@@ -128,20 +130,36 @@ const Navbar = memo(() => {
                               <BarChart3 className="w-4 h-4" />
                               Tracking
                             </Link>
+                            <Link 
+                              to="/admin/attendance" 
+                              className="flex items-center gap-3 px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 text-sm transition"
+                              onClick={() => setShowUserDropdown(false)}
+                            >
+                              <BookOpen className="w-4 h-4" />
+                              Attendance
+                            </Link>
+                            <Link 
+                              to="/admin/results" 
+                              className="flex items-center gap-3 px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 text-sm transition"
+                              onClick={() => setShowUserDropdown(false)}
+                            >
+                              <BookOpen className="w-4 h-4" />
+                              Results
+                            </Link>
                           </>
                         )}
                         {user.role === 'student' && (
                           <>
-                            <Link 
-                              to="/my-courses" 
+                            <Link
+                              to="/my-courses"
                               className="flex items-center gap-3 px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 text-sm transition"
                               onClick={() => setShowUserDropdown(false)}
                             >
                               <BookOpen className="w-4 h-4" />
                               My Courses
                             </Link>
-                            <Link 
-                              to="/profile" 
+                            <Link
+                              to="/profile"
                               className="flex items-center gap-3 px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 text-sm transition"
                               onClick={() => setShowUserDropdown(false)}
                             >
@@ -150,8 +168,8 @@ const Navbar = memo(() => {
                             </Link>
                           </>
                         )}
-                        <Link 
-                          to="/change-password" 
+                        <Link
+                          to="/change-password"
                           className="flex items-center gap-3 px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 text-sm transition"
                           onClick={() => setShowUserDropdown(false)}
                         >
@@ -160,11 +178,11 @@ const Navbar = memo(() => {
                         </Link>
                       </div>
                       <div className="border-t border-slate-100 dark:border-slate-700 pt-2 mt-2">
-                        <button 
+                        <button
                           onClick={() => {
                             setShowUserDropdown(false);
                             handleLogout();
-                          }} 
+                          }}
                           className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm transition cursor-pointer"
                         >
                           <LogOut className="w-4 h-4" />
@@ -180,8 +198,8 @@ const Navbar = memo(() => {
                 <Link to="/login" className={navLinkClass}>
                   Login
                 </Link>
-                <Link 
-                  to="/register" 
+                <Link
+                  to="/register"
                   className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 text-sm cursor-pointer"
                 >
                   Sign Up
@@ -191,7 +209,7 @@ const Navbar = memo(() => {
           </div>
         </div>
       </div>
-      
+
       {/* Mobile Navigation Menu */}
       {showMobileMenu && (
         <div className="md:hidden bg-white dark:bg-slate-800 border-t border-slate-200/50 dark:border-slate-800/50">
@@ -209,6 +227,12 @@ const Navbar = memo(() => {
                     <Link to="/admin/tracking" className={mobileNavLinkClass} onClick={() => setShowMobileMenu(false)}>
                       Tracking
                     </Link>
+                    <Link to="/admin/attendance" className={mobileNavLinkClass} onClick={() => setShowMobileMenu(false)}>
+                      Attendance
+                    </Link>
+                    <Link to="/admin/results" className={mobileNavLinkClass} onClick={() => setShowMobileMenu(false)}>
+                      Results
+                    </Link>
                   </>
                 )}
                 {user.role === 'student' && (
@@ -221,7 +245,7 @@ const Navbar = memo(() => {
                     </Link>
                   </>
                 )}
-                <button 
+                <button
                   onClick={() => { toggleTheme(); setShowMobileMenu(false); }}
                   className="block w-full text-left px-4 py-3 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 transition duration-200 cursor-pointer"
                 >
@@ -231,8 +255,8 @@ const Navbar = memo(() => {
                 <Link to="/change-password" className={mobileNavLinkClass} onClick={() => setShowMobileMenu(false)}>
                   Change Password
                 </Link>
-                <button 
-                  onClick={() => { setShowMobileMenu(false); handleLogout(); }} 
+                <button
+                  onClick={() => { setShowMobileMenu(false); handleLogout(); }}
                   className="block w-full text-left px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition duration-200 font-medium cursor-pointer"
                 >
                   Logout
@@ -243,8 +267,8 @@ const Navbar = memo(() => {
                 <Link to="/login" className={mobileNavLinkClass} onClick={() => setShowMobileMenu(false)}>
                   Login
                 </Link>
-                <Link 
-                  to="/register" 
+                <Link
+                  to="/register"
                   className="block w-full text-left px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition duration-200 cursor-pointer"
                   onClick={() => setShowMobileMenu(false)}
                 >

@@ -1,6 +1,8 @@
 import User from './models/User.js';
 import Course from './models/Course.js';
 import Enrollment from './models/Enrollment.js';
+import Attendance from './models/Attendance.js';
+import Result from './models/Result.js';
 import { protect, admin } from './middleware/auth.js';
 import connectDB from './lib/db.js';
 
@@ -110,9 +112,57 @@ export default async function handler(req, res) {
         };
       }).filter(Boolean);
 
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+      const attendanceRecords = await Attendance.find({
+        student: user._id,
+        date: { $gte: monthStart, $lt: monthEnd }
+      }).populate('course', 'title');
+
+      const attendanceMap = {};
+      attendanceRecords.forEach(r => {
+        if (!r.course) return; // Prevent crash if course was deleted
+        const key = r.course._id.toString();
+        if (!attendanceMap[key]) {
+          attendanceMap[key] = { courseId: r.course._id, courseName: r.course.title, present: 0, absent: 0, total: 0 };
+        }
+        attendanceMap[key].total++;
+        if (r.status === 'present') attendanceMap[key].present++;
+        if (r.status === 'absent') attendanceMap[key].absent++;
+      });
+
+      const attendanceSummary = Object.values(attendanceMap);
+
+      const results = await Result.find({ student: user._id })
+        .populate('course', 'title')
+        .sort('-createdAt');
+
+      const resultsGrouped = {};
+      results.forEach(r => {
+        if (!r.course) return; // Prevent crash if course was deleted
+        const key = r.course._id.toString();
+        if (!resultsGrouped[key]) {
+          resultsGrouped[key] = { courseId: r.course._id, courseName: r.course.title, exams: [] };
+        }
+        resultsGrouped[key].exams.push({
+          _id: r._id,
+          examTitle: r.examTitle,
+          obtainedMarks: r.obtainedMarks,
+          totalMarks: r.totalMarks,
+          percentage: Math.round((r.obtainedMarks / r.totalMarks) * 100),
+          publishedAt: r.createdAt
+        });
+      });
+
+      const resultsSummary = Object.values(resultsGrouped);
+
       return res.json({
         user,
-        enrolledCourses: coursesWithProgress
+        enrolledCourses: coursesWithProgress,
+        attendanceSummary,
+        resultsSummary
       });
     }
 

@@ -26,6 +26,10 @@ const Tracking = lazy(() => import("./pages/Tracking"));
 const CourseProgress = lazy(() => import("./pages/CourseProgress"));
 const StudentProgress = lazy(() => import("./pages/StudentProgress"));
 const VideoRatings = lazy(() => import("./pages/VideoRatings"));
+const AdminAttendance = lazy(() => import("./pages/AdminAttendance"));
+const AdminCourseAttendance = lazy(() => import("./pages/AdminCourseAttendance"));
+const AdminResults = lazy(() => import("./pages/AdminResults"));
+const AdminCourseResults = lazy(() => import("./pages/AdminCourseResults"));
 
 const Loading = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -86,6 +90,16 @@ function App() {
                 <Route
                   path="/admin/tracking/:courseId/ratings"
                   element={<VideoRatings />}
+                />
+                <Route path="/admin/attendance" element={<AdminAttendance />} />
+                <Route
+                  path="/admin/attendance/:courseId"
+                  element={<AdminCourseAttendance />}
+                />
+                <Route path="/admin/results" element={<AdminResults />} />
+                <Route
+                  path="/admin/results/:courseId"
+                  element={<AdminCourseResults />}
                 />
               </Routes>
             </Suspense>
