@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
@@ -7,12 +7,13 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
-const Home = lazy(() => import("./pages/Home"));
-const Courses = lazy(() => import("./pages/Courses"));
+import Home from "./pages/Home";
+import Courses from "./pages/Courses";
+import Login from "./pages/Login";
+import RegisterWithOTP from "./pages/RegisterWithOTP";
+
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
 const VideoPlayer = lazy(() => import("./pages/VideoPlayer"));
-const Login = lazy(() => import("./pages/Login"));
-const RegisterWithOTP = lazy(() => import("./pages/RegisterWithOTP"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const MyCourses = lazy(() => import("./pages/MyCourses"));
@@ -36,17 +37,8 @@ const RoutePreloader = () => {
   const location = useLocation();
   const [preloaded, setPreloaded] = useState(false);
 
-  useEffect(() => {
+  useState(() => {
     if (preloaded) return;
-    
-    const paths = location.pathname.split('/').filter(Boolean);
-    const nextPaths = [
-      '/courses',
-      '/my-courses',
-      '/admin',
-      '/login',
-      '/register'
-    ];
     
     const preloadPriority = ['/courses', '/my-courses'];
     const shouldPreload = preloadPriority.some(p => location.pathname.startsWith(p));
@@ -76,7 +68,6 @@ function App() {
         <Router>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors">
             <Navbar />
-            <RoutePreloader />
             <Suspense fallback={<Loading />}>
               <Routes>
                 <Route path="/" element={<Home />} />
