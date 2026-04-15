@@ -1,13 +1,13 @@
-import { useState, useEffect, memo } from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, Video, Award, ArrowRight, Users, Star, Play } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, Play, Star, Video } from "lucide-react";
+import { memo, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Home = memo(() => {
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    fetch('/api/courses?page=1&limit=6')
-      .then(r => r.json())
+    fetch("/api/courses?page=1&limit=6")
+      .then((r) => r.json())
       .then((coursesData) => {
         const courses = coursesData.courses || coursesData;
         setCourses(courses.slice(0, 6));
@@ -18,25 +18,25 @@ const Home = memo(() => {
   const features = [
     {
       icon: BookOpen,
-      title: 'Expert Teachers',
-      desc: 'Learn from industry experts with years of experience',
-      color: 'bg-violet-100 text-violet-600',
-      hoverColor: 'group-hover:bg-violet-600 group-hover:text-white'
+      title: "Expert Teachers",
+      desc: "Learn from industry experts with years of experience",
+      color: "bg-violet-100 text-violet-600",
+      hoverColor: "group-hover:bg-violet-600 group-hover:text-white",
     },
     {
       icon: Video,
-      title: 'Video Lessons',
-      desc: 'High-quality video content accessible anytime, anywhere',
-      color: 'bg-emerald-100 text-emerald-600',
-      hoverColor: 'group-hover:bg-emerald-600 group-hover:text-white'
+      title: "Video Lessons",
+      desc: "High-quality video content accessible anytime, anywhere",
+      color: "bg-emerald-100 text-emerald-600",
+      hoverColor: "group-hover:bg-emerald-600 group-hover:text-white",
     },
     {
       icon: Award,
-      title: 'Earn Certificates',
-      desc: 'Complete courses and earn certificates to showcase your skills',
-      color: 'bg-amber-100 text-amber-600',
-      hoverColor: 'group-hover:bg-amber-500 group-hover:text-white'
-    }
+      title: "Earn Certificates",
+      desc: "Complete courses and earn certificates to showcase your skills",
+      color: "bg-amber-100 text-amber-600",
+      hoverColor: "group-hover:bg-amber-500 group-hover:text-white",
+    },
   ];
 
   return (
@@ -56,18 +56,17 @@ const Home = memo(() => {
               <Star className="w-4 h-4 fill-emerald-400 text-emerald-400" />
               Start Your Learning Journey
             </div>
-            
+
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Welcome to{' '}
-              <span className="text-emerald-400">
-                Bipul's Classroom
-              </span>
+              Welcome to{" "}
+              <span className="text-emerald-400">Bipul's Classroom</span>
             </h1>
-            
+
             <p className="text-lg sm:text-xl mb-8 max-w-2xl text-violet-100">
-              Unlock your potential with expert-led video courses. Learn at your own pace, anywhere, anytime.
+              Unlock your potential with expert-led video courses. Learn at your
+              own pace, anywhere, anytime.
             </p>
-            
+
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/courses"
@@ -85,7 +84,7 @@ const Home = memo(() => {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-8 mt-12 pt-8 border-t border-white/20">
+            {/* <div className="flex flex-wrap gap-8 mt-12 pt-8 border-t border-white/20">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                   <Users className="w-6 h-6 text-white" />
@@ -113,13 +112,13 @@ const Home = memo(() => {
                   <div className="text-sm text-violet-100">Certificates</div>
                 </div>
               </div>
-            </div>
+            </div>  */}
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white dark:bg-slate-900">
+      {/* <section className="py-20 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
@@ -129,14 +128,16 @@ const Home = memo(() => {
               Everything you need to succeed in your learning journey
             </p>
           </div>
-          
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div
                 key={index}
                 className="group p-8 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:border-violet-200 dark:hover:border-violet-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
               >
-                <div className={`w-16 h-16 rounded-2xl ${feature.color} ${feature.hoverColor} flex items-center justify-center mb-6 transition-all duration-300`}>
+                <div
+                  className={`w-16 h-16 rounded-2xl ${feature.color} ${feature.hoverColor} flex items-center justify-center mb-6 transition-all duration-300`}
+                >
                   <feature.icon className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
@@ -149,7 +150,7 @@ const Home = memo(() => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Featured Courses */}
       <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
@@ -171,17 +172,19 @@ const Home = memo(() => {
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
-          
+
           {courses.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
                 <BookOpen className="w-10 h-10 text-slate-400" />
               </div>
-              <p className="text-slate-500 dark:text-slate-400 text-lg">No courses available yet.</p>
+              <p className="text-slate-500 dark:text-slate-400 text-lg">
+                No courses available yet.
+              </p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map(course => (
+              {courses.map((course) => (
                 <Link
                   key={course._id}
                   to={`/courses/${course._id}`}
@@ -189,9 +192,9 @@ const Home = memo(() => {
                 >
                   <div className="h-48 bg-slate-100 dark:bg-slate-700 relative overflow-hidden">
                     {course.thumbnail ? (
-                      <img 
-                        src={course.thumbnail} 
-                        alt={course.title} 
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                         loading="lazy"
                       />
@@ -203,7 +206,7 @@ const Home = memo(() => {
                       </div>
                     )}
                     <div className="absolute top-4 right-4 px-4 py-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-sm font-semibold text-emerald-600 dark:text-emerald-400 shadow-sm">
-                      {course.price === 0 ? 'Free' : `BDT ${course.price}`}
+                      {course.price === 0 ? "Free" : `BDT ${course.price}`}
                     </div>
                   </div>
                   <div className="p-6">
@@ -215,7 +218,10 @@ const Home = memo(() => {
                     </p>
                     <div className="flex items-center justify-between text-sm mb-4">
                       <span className="text-slate-500 dark:text-slate-500">
-                        By <span className="font-medium text-slate-700 dark:text-slate-300">{course.createdBy?.name || 'Unknown'}</span>
+                        By{" "}
+                        <span className="font-medium text-slate-700 dark:text-slate-300">
+                          {course.createdBy?.name || "Unknown"}
+                        </span>
                       </span>
                     </div>
                     <div className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold transition-all duration-200 hover:shadow-md cursor-pointer">
@@ -235,7 +241,7 @@ const Home = memo(() => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-400 rounded-full blur-3xl" />
         </div>
-        
+
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Start Learning?
