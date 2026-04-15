@@ -206,7 +206,7 @@ const Home = memo(() => {
                       </div>
                     )}
                     <div className="absolute top-4 right-4 px-4 py-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-sm font-semibold text-emerald-600 dark:text-emerald-400 shadow-sm">
-                      {course.price === 0 ? "Free" : `BDT ${course.price}`}
+                      {course.price === 0 ? "Free" : `BDT ${course.price} / month`}
                     </div>
                   </div>
                   <div className="p-6">

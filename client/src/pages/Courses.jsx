@@ -86,13 +86,13 @@ const Courses = memo(() => {
 
         {/* Search & Filter Bar */}
         <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex flex-col lg:flex-row gap-3">
+          <div className="flex flex-nowrap gap-2">
             {/* Search Input */}
-            <div className="flex-1 relative">
+            <div className="flex-1 min-w-0 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search courses..."
+                placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
@@ -100,24 +100,24 @@ const Courses = memo(() => {
             </div>
 
             {/* Category Select */}
-            <div className="relative">
+            <div className="relative w-24 sm:w-32 flex-shrink-0">
               <select
                 value={category}
                 onChange={handleCategoryChange}
-                className="w-full lg:w-36 px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm appearance-none cursor-pointer"
+                className="w-full px-2 sm:px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm appearance-none cursor-pointer"
               >
                 <option value="">All</option>
                 <option value="default">Default</option>
                 <option value="latest">Latest</option>
                 <option value="popular">Popular</option>
               </select>
-              <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <Filter className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-slate-400 pointer-events-none" />
             </div>
 
             {/* Search Button */}
             <button
               type="submit"
-              className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium text-sm transition-all duration-200 hover:shadow-md cursor-pointer"
+              className="px-4 sm:px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium text-sm transition-all duration-200 hover:shadow-md cursor-pointer flex-shrink-0"
             >
               Search
             </button>
@@ -219,7 +219,7 @@ const Courses = memo(() => {
                       </div>
                     )}
                     <div className="absolute top-4 right-4 px-4 py-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-sm font-bold text-emerald-600 dark:text-emerald-400 shadow-md">
-                      {course.price === 0 ? 'Free' : `BDT ${course.price}`}
+                      {course.price === 0 ? 'Free' : `BDT ${course.price} / month`}
                     </div>
                     {course.category && course.category !== 'default' && (
                       <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-violet-600 text-white text-xs font-semibold shadow-md capitalize">

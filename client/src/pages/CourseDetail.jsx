@@ -190,7 +190,7 @@ const CourseDetail = memo(() => {
                   {course.price === 0 ? (
                     <span className="text-emerald-500">Free</span>
                   ) : (
-                    <>BDT <span className="text-emerald-500">{course.price}</span></>
+                    <>BDT <span className="text-emerald-500">{course.price}</span> / month</>
                   )}
                 </div>
               </div>

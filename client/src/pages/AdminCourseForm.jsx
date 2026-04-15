@@ -240,7 +240,7 @@ const AdminCourseForm = memo(() => {
           </button>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Course Details */}
@@ -287,9 +287,9 @@ const AdminCourseForm = memo(() => {
                     )}
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Price (BDT)</label>
+                    <label className="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Price (BDT) / month</label>
                     <input
                       type="number"
                       value={course.price}
@@ -434,7 +434,7 @@ const AdminCourseForm = memo(() => {
               )}
               <h3 className="font-bold text-xl mb-2 text-slate-900 dark:text-white">{course.title || 'Course Title'}</h3>
               <p className="text-slate-600 dark:text-slate-400 text-sm mb-3">{course.description || 'Course description...'}</p>
-              <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg mb-4">{course.price === 0 ? 'Free' : `BDT ${course.price}`}</p>
+              <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg mb-4">{course.price === 0 ? 'Free' : `BDT ${course.price} / month`}</p>
               <div className="flex items-center gap-2">
                 <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${course.isPublished ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'}`}>
                   {course.isPublished ? 'Published' : 'Draft'}
