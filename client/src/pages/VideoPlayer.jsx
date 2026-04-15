@@ -251,6 +251,8 @@ const VideoPlayer = memo(() => {
 
   const hasVideos = course?.chapters?.some(ch => ch.videos?.length > 0);
 
+  const isValidVideoId = videoId && videoId.length > 0;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -297,7 +299,7 @@ const VideoPlayer = memo(() => {
   }
 
   if (!currentVideo) {
-    if (!hasVideos) {
+    if (!hasVideos || !isValidVideoId) {
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
           <div className="text-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700">
