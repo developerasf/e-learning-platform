@@ -1,12 +1,20 @@
-import { useState, memo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, Eye, EyeOff, BookOpen, ArrowRight, Loader2 } from 'lucide-react';
+import {
+  ArrowRight,
+  BookOpen,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+} from "lucide-react";
+import { memo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Login = memo(() => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login, googleAuth } = useAuth();
@@ -14,20 +22,20 @@ const Login = memo(() => {
 
   const handleGoogleResponse = async (response) => {
     if (!response.credential) return;
-    
-    const decoded = JSON.parse(atob(response.credential.split('.')[1]));
-    
+
+    const decoded = JSON.parse(atob(response.credential.split(".")[1]));
+
     setLoading(true);
     const result = await googleAuth(
       decoded.sub,
       decoded.name,
       decoded.email,
-      decoded.picture
+      decoded.picture,
     );
     setLoading(false);
-    
+
     if (result.success) {
-      navigate(result.user?.role === 'admin' ? '/admin' : '/courses');
+      navigate(result.user?.role === "admin" ? "/admin" : "/courses");
     } else {
       setError(result.message);
     }
@@ -35,12 +43,12 @@ const Login = memo(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     const result = await login(email, password);
     setLoading(false);
     if (result.success) {
-      navigate(result.user?.role === 'admin' ? '/admin' : '/courses');
+      navigate(result.user?.role === "admin" ? "/admin" : "/courses");
     } else {
       setError(result.message);
     }
@@ -88,7 +96,10 @@ const Login = memo(() => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-slate-700 dark:text-slate-300 font-medium mb-2 text-sm">
+              <label
+                htmlFor="email"
+                className="block text-slate-700 dark:text-slate-300 font-medium mb-2 text-sm"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -108,11 +119,14 @@ const Login = memo(() => {
             {/* Password Field */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="password" className="block text-slate-700 dark:text-slate-300 font-medium text-sm">
+                <label
+                  htmlFor="password"
+                  className="block text-slate-700 dark:text-slate-300 font-medium text-sm"
+                >
                   Password
                 </label>
-                <Link 
-                  to="/forgot-password" 
+                <Link
+                  to="/forgot-password"
                   className="text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium transition duration-200 cursor-pointer"
                 >
                   Forgot password?
@@ -122,7 +136,7 @@ const Login = memo(() => {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -134,7 +148,11 @@ const Login = memo(() => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -160,25 +178,27 @@ const Login = memo(() => {
           </form>
 
           {/* Divider */}
-          <div className="relative my-8">
+          {/* <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-200 dark:border-slate-600"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">Or continue with</span>
+              <span className="px-4 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                Or continue with
+              </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Google Button Placeholder */}
-          <div className="text-center text-sm text-slate-500 dark:text-slate-400">
+          {/* <div className="text-center text-sm text-slate-500 dark:text-slate-400">
             <span>Google OAuth available</span>
-          </div>
+          </div> */}
 
           {/* Sign Up Link */}
           <p className="text-center text-slate-600 dark:text-slate-400 mt-8">
-            Don't have an account?{' '}
-            <Link 
-              to="/register" 
+            Don't have an account?{" "}
+            <Link
+              to="/register"
               className="text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-semibold transition duration-200 cursor-pointer"
             >
               Create one
@@ -188,8 +208,8 @@ const Login = memo(() => {
 
         {/* Back Link */}
         <div className="text-center mt-6">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-sm font-medium transition duration-200 cursor-pointer"
           >
             <ArrowRight className="w-4 h-4 rotate-180" />
@@ -201,5 +221,5 @@ const Login = memo(() => {
   );
 });
 
-Login.displayName = 'Login';
+Login.displayName = "Login";
 export default Login;
