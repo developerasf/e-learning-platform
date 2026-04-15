@@ -1,13 +1,13 @@
 import { ArrowRight, Award, BookOpen, Play, Star, Video } from "lucide-react";
 import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { fetchWithCache } from "../lib/apiCache";
 
 const Home = memo(() => {
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    fetch("/api/courses?page=1&limit=6")
-      .then((r) => r.json())
+    fetchWithCache("/api/courses?page=1&limit=6")
       .then((coursesData) => {
         const courses = coursesData.courses || coursesData;
         setCourses(courses.slice(0, 6));
@@ -206,7 +206,7 @@ const Home = memo(() => {
                       </div>
                     )}
                     <div className="absolute top-4 right-4 px-4 py-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-sm font-semibold text-emerald-600 dark:text-emerald-400 shadow-sm">
-                      {course.price === 0 ? "Free" : `BDT ${course.price}`}
+                      {course.price === 0 ? "Free" : `BDT ${course.price} / month`}
                     </div>
                   </div>
                   <div className="p-6">

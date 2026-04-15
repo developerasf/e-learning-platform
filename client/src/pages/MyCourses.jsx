@@ -2,6 +2,7 @@ import { useState, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { BookOpen, Play, ArrowRight, Plus, Clock, CheckCircle, BarChart3 } from 'lucide-react';
+import { fetchWithCache } from '../lib/apiCache';
 
 const MyCourses = memo(() => {
   const [courses, setCourses] = useState([]);
@@ -20,13 +21,11 @@ const MyCourses = memo(() => {
   const fetchCourses = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/users/profile', {
+      const data = await fetchWithCache('/api/users/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      const data = await res.json();
-      console.log('Profile data:', data);
       if (data.enrolledCourses) {
         setCourses(data.enrolledCourses);
       }

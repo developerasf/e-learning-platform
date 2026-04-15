@@ -196,21 +196,32 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    enrollmentCache.clear();
   };
+
+  const enrollmentCache = new Map();
 
   const isEnrolled = (courseId) => {
     if (!user) return false;
     if (user.role === 'admin') return true;
+    if (enrollmentCache.has(courseId)) {
+      return enrollmentCache.get(courseId);
+    }
     if (!user.enrolledCourses) return false;
     const courseIdStr = courseId.toString();
-    return user.enrolledCourses.some(id => 
+    const result = user.enrolledCourses.some(id => 
       id === courseIdStr || 
       id?.toString() === courseIdStr
     );
+    enrollmentCache.set(courseId, result);
+    return result;
   };
 
   const checkEnrollment = async (courseId) => {
     if (!user) return false;
+    if (enrollmentCache.has(courseId)) {
+      return enrollmentCache.get(courseId);
+    }
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(`/api/courses/${courseId}/enrollment-status`, {
@@ -218,7 +229,9 @@ export const AuthProvider = ({ children }) => {
       });
       if (res.ok) {
         const data = await res.json();
-        return data.status === 'approved';
+        const result = data.status === 'approved';
+        enrollmentCache.set(courseId, result);
+        return result;
       }
     } catch (err) {
       console.error('Error checking enrollment:', err);
@@ -230,6 +243,7 @@ export const AuthProvider = ({ children }) => {
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
+      enrollmentCache.clear();
     }
   };
 

@@ -159,7 +159,11 @@ const VideoPlayer = memo(() => {
       playerVars: {
         autoplay: 0,
         rel: 0,
-        modestbranding: 1,
+        controls: 1,
+        disablekb: 0,
+        fs: 1,
+        showinfo: 1,
+        modestbranding: 0,
       },
       events: {
         onReady: () => {},
@@ -245,6 +249,10 @@ const VideoPlayer = memo(() => {
   const prevVideo = useMemo(() => allVideos[currentIndex - 1], [allVideos, currentIndex]);
   const isWatched = watchedVideos.includes(videoId);
 
+  const hasVideos = course?.chapters?.some(ch => ch.videos?.length > 0);
+
+  const isValidVideoId = videoId && videoId.length > 0;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -291,6 +299,22 @@ const VideoPlayer = memo(() => {
   }
 
   if (!currentVideo) {
+    if (!hasVideos || !isValidVideoId) {
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+          <div className="text-center bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700">
+            <div className="w-20 h-20 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mx-auto mb-4">
+              <Play className="w-10 h-10 text-violet-600" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">Coming Soon</h2>
+            <p className="text-slate-500 dark:text-slate-400">No videos added to this course yet.</p>
+            <Link to={`/courses/${courseId}`} className="text-violet-600 dark:text-violet-400 font-medium mt-4 inline-block cursor-pointer">
+              Back to Course
+            </Link>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
@@ -305,34 +329,6 @@ const VideoPlayer = memo(() => {
       {/* Video Container */}
       <div ref={videoContainerRef} className="relative w-full h-[50vw] sm:h-[45vw] md:h-[40vw] lg:h-[500px] xl:h-[600px] bg-black">
         <div id="youtube-player" className="w-full h-full"></div>
-        
-        {/* Controls */}
-        <div className="absolute top-4 right-4 flex gap-2 z-10">
-          <select
-            value={playbackSpeed}
-            onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-            className="bg-black/80 text-white text-sm px-3 py-2 rounded-xl backdrop-blur-sm cursor-pointer border border-white/10"
-          >
-            <option value="0.5">0.5x</option>
-            <option value="0.75">0.75x</option>
-            <option value="1">1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="2">2x</option>
-          </select>
-          
-          <button
-            onClick={toggleFullscreen}
-            className="bg-black/80 text-white p-2.5 rounded-xl backdrop-blur-sm hover:bg-black/90 transition cursor-pointer border border-white/10"
-            title="Fullscreen"
-          >
-            {isFullscreen ? (
-              <Minimize className="w-5 h-5" />
-            ) : (
-              <Maximize className="w-5 h-5" />
-            )}
-          </button>
-        </div>
       </div>
 
       {/* Content Area */}

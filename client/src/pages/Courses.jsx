@@ -1,6 +1,7 @@
 import { BookOpen, ChevronLeft, ChevronRight, Filter, Play, Search, X } from 'lucide-react';
 import { memo, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { fetchWithCache, clearCache } from '../lib/apiCache';
 
 const Courses = memo(() => {
   const [courses, setCourses] = useState([]);
@@ -19,7 +20,7 @@ const Courses = memo(() => {
       .catch(console.error);
   }, []);
 
-  const fetchCourses = async (pageNum = 1, searchTerm = search, cat = category) => {
+  const fetchCourses = async (pageNum = 1, searchTerm = search, cat = category, useCache = false) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -28,8 +29,8 @@ const Courses = memo(() => {
       if (searchTerm) params.append('search', searchTerm);
       if (cat) params.append('category', cat);
 
-      const res = await fetch(`/api/courses?${params}`);
-      const data = await res.json();
+      const url = `/api/courses?${params}`;
+      const data = useCache ? await fetchWithCache(url) : await fetch(url).then(r => r.json());
 
       if (data.courses) {
         setCourses(data.courses);
@@ -45,75 +46,78 @@ const Courses = memo(() => {
   };
 
   useEffect(() => {
-    fetchCourses(page);
+    fetchCourses(page, '', '', page === 1);
   }, [page]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchCourses(1, search, category);
+    clearCache();
+    fetchCourses(1, search, category, false);
   };
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
     setPage(1);
-    fetchCourses(1, search, e.target.value);
+    clearCache();
+    fetchCourses(1, search, e.target.value, false);
   };
 
   const clearFilters = () => {
     setSearch('');
     setCategory('');
     setPage(1);
-    fetchCourses(1, '', '');
+    clearCache();
+    fetchCourses(1, '', '', false);
   };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-12 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white mb-2">
             All Courses
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Explore our comprehensive video courses and start learning today
+          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+            Explore our video courses and start learning today
           </p>
         </div>
 
         {/* Search & Filter Bar */}
-        <form onSubmit={handleSearch} className="mb-10">
-          <div className="flex flex-col lg:flex-row gap-4">
+        <form onSubmit={handleSearch} className="mb-8">
+          <div className="flex flex-nowrap gap-2">
             {/* Search Input */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <div className="flex-1 min-w-0 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search courses..."
+                placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
               />
             </div>
 
             {/* Category Select */}
-            <div className="relative">
+            <div className="relative w-24 sm:w-32 flex-shrink-0">
               <select
                 value={category}
                 onChange={handleCategoryChange}
-                className="w-full lg:w-48 px-4 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm appearance-none cursor-pointer"
+                className="w-full px-2 sm:px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm appearance-none cursor-pointer"
               >
-                <option value="">All Categories</option>
+                <option value="">All</option>
                 <option value="default">Default</option>
                 <option value="latest">Latest</option>
                 <option value="popular">Popular</option>
               </select>
-              <Filter className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+              <Filter className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-slate-400 pointer-events-none" />
             </div>
 
             {/* Search Button */}
             <button
               type="submit"
-              className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-semibold transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+              className="px-4 sm:px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium text-sm transition-all duration-200 hover:shadow-md cursor-pointer flex-shrink-0"
             >
               Search
             </button>
@@ -215,7 +219,7 @@ const Courses = memo(() => {
                       </div>
                     )}
                     <div className="absolute top-4 right-4 px-4 py-1.5 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-sm font-bold text-emerald-600 dark:text-emerald-400 shadow-md">
-                      {course.price === 0 ? 'Free' : `BDT ${course.price}`}
+                      {course.price === 0 ? 'Free' : `BDT ${course.price} / month`}
                     </div>
                     {course.category && course.category !== 'default' && (
                       <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-violet-600 text-white text-xs font-semibold shadow-md capitalize">

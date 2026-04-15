@@ -1109,8 +1109,7 @@ export default async function handler(req, res) {
       .filter(e => e.student && e.student.role !== 'admin')
       .map(e => ({
         _id: e.student._id,
-        name: e.student.name,
-        email: e.student.email
+        name: e.student.name
       }));
 
     const records = await Attendance.find({
@@ -1193,8 +1192,7 @@ export default async function handler(req, res) {
       .filter(e => e.student && e.student.role !== 'admin')
       .map(e => ({
         _id: e.student._id,
-        name: e.student.name,
-        email: e.student.email
+        name: e.student.name
       }));
 
     const records = await Attendance.find({

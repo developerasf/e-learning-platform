@@ -1,9 +1,8 @@
 const apiCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000;
 
-export const fetchWithCache = async (url, options = {}, cacheKey = null) => {
-  const key = cacheKey || url;
-  const cached = apiCache.get(key);
+export const fetchWithCache = async (url, options = {}) => {
+  const cached = apiCache.get(url);
   
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data;
@@ -12,14 +11,14 @@ export const fetchWithCache = async (url, options = {}, cacheKey = null) => {
   const response = await fetch(url, options);
   const data = await response.json();
   
-  apiCache.set(key, { data, timestamp: Date.now() });
+  apiCache.set(url, { data, timestamp: Date.now() });
   
   return data;
 };
 
-export const clearCache = (key = null) => {
-  if (key) {
-    apiCache.delete(key);
+export const clearCache = (url = null) => {
+  if (url) {
+    apiCache.delete(url);
   } else {
     apiCache.clear();
   }

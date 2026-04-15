@@ -244,7 +244,6 @@ const AdminCourseAttendance = () => {
                       <tr className="border-b border-gray-200 dark:border-gray-700">
                         <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">#</th>
                         <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Student</th>
-                        <th className="text-left px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Email</th>
                         <th className="text-center px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
                       </tr>
                     </thead>
@@ -255,7 +254,7 @@ const AdminCourseAttendance = () => {
                           <td className="px-6 py-4">
                             <span className="font-medium text-gray-900 dark:text-white text-sm">{student.name}</span>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{student.email}</td>
+
                           <td className="px-6 py-4 text-center">
                             <button
                               onClick={() => toggleStatus(student._id)}
@@ -356,10 +355,7 @@ const AdminCourseAttendance = () => {
                           <tr key={student._id} className="border-b border-gray-100 dark:border-gray-700/50">
                             <td className="px-6 py-4 text-sm text-gray-500">{idx + 1}</td>
                             <td className="px-6 py-4">
-                              <div>
-                                <p className="font-medium text-gray-900 dark:text-white text-sm">{student.name}</p>
-                                <p className="text-xs text-gray-400">{student.email}</p>
-                              </div>
+                              <span className="font-medium text-gray-900 dark:text-white text-sm">{student.name}</span>
                             </td>
                             <td className="px-6 py-4 text-center">
                               <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-medium">
