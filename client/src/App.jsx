@@ -6,6 +6,7 @@ import Toast from "./components/Toast";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { PreloadProvider } from "./context/PreloadContext";
 
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
@@ -64,13 +65,14 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <SpeedInsights />
-        <Router>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors">
-            <Navbar />
-            <Suspense fallback={<Loading />}>
-              <Routes>
-                <Route path="/" element={<Home />} />
+        <PreloadProvider>
+          <SpeedInsights />
+          <Router>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors">
+              <Navbar />
+              <Suspense fallback={<Loading />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/courses/:id" element={<CourseDetail />} />
                 <Route
@@ -131,6 +133,7 @@ function App() {
             <Toast />
           </div>
         </Router>
+        </PreloadProvider>
       </ThemeProvider>
     </AuthProvider>
   );

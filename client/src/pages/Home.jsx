@@ -1,19 +1,25 @@
 import { ArrowRight, Award, BookOpen, Play, Star, Video } from "lucide-react";
 import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchWithCache } from "../lib/apiCache";
+import { usePreload } from "../context/PreloadContext";
 
 const Home = memo(() => {
+  const { preloadedCourses, preloading } = usePreload();
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    fetchWithCache("/api/courses?page=1&limit=6")
-      .then((coursesData) => {
-        const courses = coursesData.courses || coursesData;
-        setCourses(courses.slice(0, 6));
-      })
-      .catch(console.error);
-  }, []);
+    if (preloadedCourses) {
+      setCourses(preloadedCourses);
+    } else if (!preloading) {
+      fetch("/api/courses?page=1&limit=6")
+        .then((r) => r.json())
+        .then((coursesData) => {
+          const courses = coursesData.courses || coursesData;
+          setCourses(courses.slice(0, 6));
+        })
+        .catch(console.error);
+    }
+  }, [preloadedCourses, preloading]);
 
   const features = [
     {
@@ -173,7 +179,11 @@ const Home = memo(() => {
             </Link>
           </div>
 
-          {courses.length === 0 ? (
+          {preloading ? (
+            <div className="flex justify-center py-16">
+              <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : courses.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
                 <BookOpen className="w-10 h-10 text-slate-400" />
