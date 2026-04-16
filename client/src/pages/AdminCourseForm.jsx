@@ -172,10 +172,21 @@ const AdminCourseForm = memo(() => {
   };
 
   const handleDeleteChapter = async (chapterId) => {
-    if (!confirm('Delete this chapter?')) return;
+    if (!confirm('Delete this chapter? This will also delete all videos in this chapter.')) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-    if (res.ok) { const data = await res.json(); setCourse(data); }
+    try {
+      const res = await fetch(`/api/courses/${id}/chapters/${chapterId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) { 
+        const data = await res.json(); 
+        setCourse(data); 
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Failed to delete chapter');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete chapter');
+    }
   };
 
   const handleAddVideo = async () => {
@@ -192,8 +203,22 @@ const AdminCourseForm = memo(() => {
   const handleDeleteVideo = async (chapterId, videoId) => {
     if (!confirm('Delete this video?')) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/videos/${videoId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-    if (res.ok) { const data = await res.json(); setCourse(data); }
+    try {
+      const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/videos/${videoId}`, { 
+        method: 'DELETE', 
+        headers: { 'Authorization': `Bearer ${token}` } 
+      });
+      if (res.ok) { 
+        const data = await res.json(); 
+        setCourse(data); 
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Failed to delete video');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete video');
+    }
   };
 
   const handleDeleteSingleNote = async (chapterId, noteId) => {

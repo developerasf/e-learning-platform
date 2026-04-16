@@ -4,6 +4,7 @@ import { Writable } from 'stream';
 import sharp from 'sharp';
 import Settings from './_models/Settings.js';
 import connectDB from './_lib/db.js';
+import { protect, admin } from './_middleware/auth.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -113,6 +114,18 @@ export default async function handler(req, res) {
   if (method === 'GET' && (path === '/banner' || path === '/api/banner')) {
     const settings = await Settings.findOne({ key: 'banner' });
     return res.json({ url: settings?.value || '' });
+  }
+
+  // Delete banner
+  if (method === 'DELETE' && (path === '/banner' || path === '/api/banner')) {
+    const authError = await protect(req, res);
+    if (authError) return authError;
+
+    const adminError = admin(req, res);
+    if (adminError) return adminError;
+
+    await Settings.findOneAndDelete({ key: 'banner' });
+    return res.json({ message: 'Banner deleted' });
   }
 
   // Thumbnail upload

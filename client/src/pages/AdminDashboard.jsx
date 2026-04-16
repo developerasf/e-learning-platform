@@ -66,6 +66,22 @@ const AdminDashboard = memo(() => {
     setBannerUploading(false);
   };
 
+  const handleDeleteBanner = async () => {
+    if (!confirm('Delete this banner?')) return;
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('/api/upload/banner', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setBanner('');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this course?')) return;
     const token = localStorage.getItem('token');
@@ -195,7 +211,7 @@ const AdminDashboard = memo(() => {
                     className="w-full h-40 object-cover group-hover:opacity-80 transition duration-200" 
                   />
                   <button
-                    onClick={() => setBanner('')}
+                    onClick={handleDeleteBanner}
                     className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200 opacity-0 group-hover:opacity-100 cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
