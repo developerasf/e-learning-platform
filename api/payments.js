@@ -92,10 +92,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      if (status === 'unpaid') {
+      if (status === 'due') {
         // Remove the payment record
         await Payment.findOneAndDelete({ student: studentId, month, year });
-        return res.json({ message: 'Payment status updated to unpaid' });
+        return res.json({ message: 'Payment status updated to due' });
       } else if (status === 'paid') {
         // Upsert the payment record
         const payment = await Payment.findOneAndUpdate(
