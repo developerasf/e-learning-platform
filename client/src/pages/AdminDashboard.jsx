@@ -1,14 +1,12 @@
 import { useState, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Settings, Users, FileText, Plus, Upload, Image, Trash2, Edit, Eye, EyeOff, CheckCircle, Clock, BarChart3, BookOpen, Loader2, CreditCard } from 'lucide-react';
+import { Settings, Users, FileText, Plus, Trash2, Edit, Eye, EyeOff, CheckCircle, Clock, BarChart3, BookOpen, Loader2, CreditCard } from 'lucide-react';
 
 const AdminDashboard = memo(() => {
   const [courses, setCourses] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [banner, setBanner] = useState('');
-  const [bannerUploading, setBannerUploading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -24,13 +22,11 @@ const AdminDashboard = memo(() => {
       }).then(r => r.json()),
       fetch('/api/courses/enrollments/pending?page=1&limit=100', {
         headers: { 'Authorization': `Bearer ${token}` }
-      }).then(r => r.json()),
-      fetch('/api/upload/banner').then(r => r.json())
+      }).then(r => r.json())
     ])
-      .then(([coursesData, enrollmentsData, bannerData]) => {
+      .then(([coursesData, enrollmentsData]) => {
         setCourses(coursesData.courses || coursesData);
         setPendingCount(enrollmentsData.enrollments?.length || enrollmentsData.length || 0);
-        setBanner(bannerData.url || '');
         setLoading(false);
       })
       .catch(err => {
@@ -38,49 +34,6 @@ const AdminDashboard = memo(() => {
         setLoading(false);
       });
   }, [user, navigate]);
-
-  const handleBannerUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    setBannerUploading(true);
-    const formData = new FormData();
-    formData.append('banner', file);
-    
-    const token = localStorage.getItem('token');
-    
-    try {
-      const res = await fetch('/api/upload/banner', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        setBanner(data.url);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-    setBannerUploading(false);
-  };
-
-  const handleDeleteBanner = async () => {
-    if (!confirm('Delete this banner?')) return;
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch('/api/upload/banner', {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        setBanner('');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this course?')) return;
@@ -163,69 +116,6 @@ const AdminDashboard = memo(() => {
               <Plus className="w-4 h-4" />
               New Course
             </Link>
-          </div>
-        </div>
-
-        {/* Banner Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700 p-6 sm:p-8 mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-              <Image className="w-6 h-6 text-violet-600" />
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Home Page Banner</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Upload Area */}
-            <div className="md:col-span-1">
-              <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Upload New Banner</label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBannerUpload}
-                  disabled={bannerUploading}
-                  className="w-full px-4 py-4 border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl text-sm bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white cursor-pointer hover:border-violet-400 transition duration-200"
-                />
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
-                Recommended: 1920x500px<br/>
-                Formats: JPG, PNG, WebP
-              </p>
-              {bannerUploading && (
-                <div className="mt-3 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 text-violet-600 animate-spin" />
-                  <span className="text-sm text-violet-600 dark:text-violet-400">Uploading...</span>
-                </div>
-              )}
-            </div>
-
-            {/* Preview Area */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Current Banner</label>
-              {banner ? (
-                <div className="relative rounded-xl overflow-hidden shadow-lg group">
-                  <img 
-                    src={banner} 
-                    alt="Banner Preview" 
-                    className="w-full h-40 object-cover group-hover:opacity-80 transition duration-200" 
-                  />
-                  <button
-                    onClick={handleDeleteBanner}
-                    className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition duration-200 opacity-0 group-hover:opacity-100 cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="h-40 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-xl flex items-center justify-center">
-                  <div className="text-center text-slate-400">
-                    <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No banner uploaded</p>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
