@@ -9,8 +9,8 @@ const AdminPayments = memo(() => {
   const [search, setSearch] = useState('');
   
   const currentDate = new Date();
-  const [month, setMonth] = useState(currentDate.getMonth() === 0 ? 12 : currentDate.getMonth());
-  const [year, setYear] = useState(currentDate.getMonth() === 0 ? currentDate.getFullYear() - 1 : currentDate.getFullYear());
+  const [month, setMonth] = useState(currentDate.getMonth() + 1);
+  const [year, setYear] = useState(currentDate.getFullYear());
 
   const fetchPayments = async () => {
     setLoading(true);

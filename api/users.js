@@ -160,22 +160,18 @@ export default async function handler(req, res) {
 
       const resultsSummary = Object.values(resultsGrouped);
 
-      // Fetch last month's payment status
+      // Fetch current month's payment status
       const currentDate = new Date();
-      let lastMonth = currentDate.getMonth(); // 0-based month equals 1-based previous month
-      let lastYear = currentDate.getFullYear();
-      if (lastMonth === 0) {
-        lastMonth = 12;
-        lastYear -= 1;
-      }
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentYear = currentDate.getFullYear();
       
-      const lastMonthPaymentRec = await Payment.findOne({
+      const currentMonthPaymentRec = await Payment.findOne({
         student: user._id,
-        month: lastMonth,
-        year: lastYear
+        month: currentMonth,
+        year: currentYear
       });
 
-      const paymentStatus = lastMonthPaymentRec ? lastMonthPaymentRec.status : 'unpaid';
+      const paymentStatus = currentMonthPaymentRec ? currentMonthPaymentRec.status : 'due';
 
       return res.json({
         user,
@@ -184,8 +180,8 @@ export default async function handler(req, res) {
         resultsSummary,
         lastMonthPayment: {
           status: paymentStatus,
-          month: lastMonth,
-          year: lastYear
+          month: currentMonth,
+          year: currentYear
         }
       });
     }
