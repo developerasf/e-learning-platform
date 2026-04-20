@@ -30,7 +30,7 @@ const Courses = memo(() => {
       if (cat) params.append('category', cat);
 
       const url = `/api/courses?${params}`;
-      const data = useCache ? await fetchWithCache(url) : await fetch(url).then(r => r.json());
+      const data = useCache && pageNum === 1 ? await fetchWithCache(url) : await fetch(url).then(r => r.json());
 
       if (data.courses) {
         setCourses(data.courses);

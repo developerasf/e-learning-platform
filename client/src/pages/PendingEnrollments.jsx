@@ -32,6 +32,8 @@ const PendingEnrollments = memo(() => {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    // Clear enrollment caches
+    localStorage.removeItem('user');
     loadEnrollments();
   };
 
@@ -41,6 +43,8 @@ const PendingEnrollments = memo(() => {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    // Clear enrollment caches
+    localStorage.removeItem('user');
     loadEnrollments();
   };
 

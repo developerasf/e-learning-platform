@@ -1,5 +1,5 @@
 const apiCache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000;
+const CACHE_DURATION = 30 * 1000; // 30 seconds only
 
 export const fetchWithCache = async (url, options = {}) => {
   const cached = apiCache.get(url);

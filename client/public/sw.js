@@ -6,9 +6,6 @@ const STATIC_ASSETS = [
   '/manifest.json'
 ];
 
-const API_CACHE_NAME = 'eduspace-api-v1';
-const API_CACHE_DURATION = 5 * 60 * 1000;
-
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -23,7 +20,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
+          if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
@@ -37,11 +34,12 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Don't cache API calls - just pass through
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(cacheFirstAPI(request));
     return;
   }
 
+  // Cache static assets only
   if (request.method !== 'GET') return;
 
   event.respondWith(
@@ -62,23 +60,3 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
-
-async function cacheFirstAPI(request) {
-  const cached = await caches.match(request);
-  if (cached) {
-    return cached;
-  }
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(API_CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch (error) {
-    return new Response(JSON.stringify({ error: 'Offline' }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-}

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect } from 'react';
+import { clearCache } from '../lib/apiCache';
 
 const AuthContext = createContext();
 
@@ -243,6 +244,7 @@ export const AuthProvider = ({ children }) => {
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
+      clearCache();
       enrollmentCache.clear();
     }
   };

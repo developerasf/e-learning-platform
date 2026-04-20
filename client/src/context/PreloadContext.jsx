@@ -9,16 +9,20 @@ export const PreloadProvider = ({ children }) => {
   const [preloading, setPreloading] = useState(true);
 
   useEffect(() => {
+    // Try localStorage first (15 seconds max)
     const cached = localStorage.getItem('preloadedCourses');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
+        if (Date.now() - parsed.timestamp < 15 * 1000) {
           setPreloadedCourses(parsed.data);
+          setPreloading(false);
+          return;
         }
       } catch (e) {}
     }
 
+    // Fetch fresh data
     fetch('/api/courses?page=1&limit=6')
       .then(r => r.json())
       .then(data => {
