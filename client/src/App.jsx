@@ -3,6 +3,7 @@ import { Route, BrowserRouter as Router, Routes, useLocation } from "react-route
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Toast from "./components/Toast";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -68,6 +69,7 @@ function App() {
         <PreloadProvider>
           <SpeedInsights />
           <Router>
+            <ErrorBoundary>
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors">
               <Navbar />
               <Suspense fallback={<Loading />}>
@@ -127,11 +129,10 @@ function App() {
                   element={<AdminCourseResults />}
                 />
                 <Route path="/admin/payments" element={<AdminPayments />} />
-              </Routes>
-            </Suspense>
-            <Footer />
-            <Toast />
-          </div>
+</Routes>
+              </Suspense>
+            </div>
+            </ErrorBoundary>
         </Router>
         </PreloadProvider>
       </ThemeProvider>

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Maximize, Minimize, Star, CheckCircle, ChevronDown, ChevronUp, FileText, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const VideoPlayer = memo(() => {
   const { courseId, videoId } = useParams();
@@ -11,6 +12,7 @@ const VideoPlayer = memo(() => {
   const [currentVideo, setCurrentVideo] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [enrolled, setEnrolled] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -48,9 +50,15 @@ const VideoPlayer = memo(() => {
   }, []);
 
   useEffect(() => {
-    fetch(`/api/courses/${courseId}`)
-      .then(res => res.json())
-      .then(data => {
+    const fetchCourseData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/courses/${courseId}`);
+        if (!res.ok) {
+          throw new Error('Failed to fetch course data');
+        }
+        const data = await res.json();
         setCourse(data);
         for (const chapter of data.chapters || []) {
           const video = chapter.videos?.find(v => v._id === videoId);
@@ -60,12 +68,14 @@ const VideoPlayer = memo(() => {
             break;
           }
         }
-        setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error(err);
+        setError(err.message || 'Failed to load course');
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchCourseData();
   }, [courseId, videoId]);
 
   useEffect(() => {
@@ -266,6 +276,34 @@ const VideoPlayer = memo(() => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center bg-slate-800 p-8 rounded-3xl shadow-xl border border-slate-700 max-w-md">
+          <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">⚠</span>
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Failed to load video</h2>
+          <p className="text-slate-400 mb-6">{error}</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition cursor-pointer"
+            >
+              Try Again
+            </button>
+            <Link
+              to="/courses"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition cursor-pointer"
+            >
+              Browse Courses
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!course) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
@@ -336,14 +374,13 @@ const VideoPlayer = memo(() => {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="flex-1">
-            {/* Back to Course */}
-            <Link 
-              to={`/courses/${courseId}`}
-              className="inline-flex items-center gap-2 text-slate-400 hover:text-violet-400 text-sm mb-4 transition cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Course
-            </Link>
+            {/* Breadcrumbs */}
+            <Breadcrumbs items={[
+              { label: 'Courses', link: '/courses' },
+              { label: course?.title, link: `/courses/${courseId}` },
+              { label: currentChapter?.title || 'Chapter' },
+              { label: currentVideo?.title || 'Video' }
+            ]} />
 
             {/* Title */}
             <div className="mb-6">

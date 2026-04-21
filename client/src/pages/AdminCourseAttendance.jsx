@@ -173,14 +173,14 @@ const AdminCourseAttendance = () => {
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setActiveTab('mark')}
-            className={`px-4 py-2 rounded-xl font-medium text-sm transition cursor-pointer ${activeTab === 'mark' ? 'bg-violet-600 text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}
+            className={`px-4 py-2 rounded-xl font-medium text-sm transition cursor-pointer ${activeTab === 'mark' ? 'bg-violet-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}
           >
             <Calendar className="w-4 h-4 inline mr-2" />
             Mark Attendance
           </button>
           <button
             onClick={() => setActiveTab('summary')}
-            className={`px-4 py-2 rounded-xl font-medium text-sm transition cursor-pointer ${activeTab === 'summary' ? 'bg-violet-600 text-white shadow-md' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}
+            className={`px-4 py-2 rounded-xl font-medium text-sm transition cursor-pointer ${activeTab === 'summary' ? 'bg-violet-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}
           >
             <BarChart3 className="w-4 h-4 inline mr-2" />
             Monthly Summary
@@ -189,7 +189,7 @@ const AdminCourseAttendance = () => {
 
         {activeTab === 'mark' && (
           <>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <button onClick={() => changeDate(-1)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">
@@ -233,11 +233,11 @@ const AdminCourseAttendance = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-4 border-violet-500 border-t-transparent"></div>
               </div>
             ) : students.length === 0 ? (
-              <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700">
                 <p className="text-gray-500 dark:text-gray-400">No students enrolled in this course</p>
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -305,7 +305,7 @@ const AdminCourseAttendance = () => {
 
         {activeTab === 'summary' && (
           <>
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
               <div className="flex items-center gap-3">
                 <button onClick={() => changeMonth(-1)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer">
                   <ChevronLeft className="w-5 h-5 text-gray-500" />
@@ -332,7 +332,7 @@ const AdminCourseAttendance = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-4 border-violet-500 border-t-transparent"></div>
               </div>
             ) : !summaryData || summaryData.students.length === 0 ? (
-              <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700">
                 <p className="text-gray-500 dark:text-gray-400">No attendance data for this month</p>
               </div>
             ) : (
@@ -340,7 +340,7 @@ const AdminCourseAttendance = () => {
                 {summaryData.students.map((student, idx) => {
                   const pct = student.totalClasses > 0 ? Math.round((student.present / student.totalClasses) * 100) : 0;
                   return (
-                    <div key={student._id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                    <div key={student._id} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white text-sm">{idx + 1}. {student.name}</p>

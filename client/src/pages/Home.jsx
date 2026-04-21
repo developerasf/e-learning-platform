@@ -2,22 +2,33 @@ import { ArrowRight, Award, BookOpen, Play, Star, Video } from "lucide-react";
 import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { usePreload } from "../context/PreloadContext";
+import { CourseCardSkeleton } from "../components/Skeleton";
 
 const Home = memo(() => {
   const { preloadedCourses, preloading } = usePreload();
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (preloadedCourses) {
       setCourses(preloadedCourses);
+      setLoading(false);
     } else if (!preloading) {
       fetch("/api/courses?page=1&limit=6")
         .then((r) => r.json())
         .then((coursesData) => {
           const courses = coursesData.courses || coursesData;
           setCourses(courses.slice(0, 6));
+          setLoading(false);
         })
-        .catch(console.error);
+        .catch((err) => {
+          console.error(err);
+          setError(err.message);
+          setLoading(false);
+        });
+    } else {
+      setLoading(true);
     }
   }, [preloadedCourses, preloading]);
 
@@ -179,9 +190,41 @@ const Home = memo(() => {
             </Link>
           </div>
 
-          {preloading ? (
-            <div className="flex justify-center py-16">
-              <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+          {preloading || loading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <CourseCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">⚠</span>
+              </div>
+              <p className="text-red-600 dark:text-red-400 text-lg mb-4">
+                Failed to load courses
+              </p>
+              <button
+                onClick={() => {
+                  setError(null);
+                  setLoading(true);
+                  fetch("/api/courses?page=1&limit=6")
+                    .then((r) => r.json())
+                    .then((coursesData) => {
+                      const courses = coursesData.courses || coursesData;
+                      setCourses(courses.slice(0, 6));
+                      setLoading(false);
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      setError(err.message);
+                      setLoading(false);
+                    });
+                }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition cursor-pointer"
+              >
+                Try Again
+              </button>
             </div>
           ) : courses.length === 0 ? (
             <div className="text-center py-16">

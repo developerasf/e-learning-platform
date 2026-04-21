@@ -5,6 +5,7 @@ import sharp from 'sharp';
 import Settings from './_models/Settings.js';
 import connectDB from './_lib/db.js';
 import { protect, admin } from './_middleware/auth.js';
+import { getPath } from './_lib/utils.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

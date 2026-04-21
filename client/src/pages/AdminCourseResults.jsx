@@ -181,7 +181,7 @@ const AdminCourseResults = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Add/Edit Form */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 sticky top-24">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 sticky top-24">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 {editingResultId ? (
                   <><Edit2 className="w-5 h-5 text-amber-500" /> Edit Result</>
@@ -273,7 +273,7 @@ const AdminCourseResults = () => {
 
           {/* Results List */}
           <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900/50">
                 <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   Published Results <span className="px-2 py-0.5 rounded-md bg-gray-200 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300">{results.length}</span>
@@ -304,7 +304,7 @@ const AdminCourseResults = () => {
                       {results.map((result) => {
                         const pct = Math.round((result.obtainedMarks / result.totalMarks) * 100);
                         return (
-                          <tr key={result._id} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                          <tr key={result._id} className="bg-white dark:bg-slate-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30">
                             <td className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                               {result.student?.name || 'Unknown'}
                             </td>

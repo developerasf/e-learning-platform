@@ -103,20 +103,20 @@ const StudentProgress = memo(() => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Progress</p>
             <p className="text-2xl sm:text-3xl font-bold text-violet-600 dark:text-violet-400">
               {data.progress.percentage}%
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Videos Watched</p>
             <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">
               {data.progress.watchedVideos}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">out of {data.progress.totalVideos}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Total Days Active</p>
             <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
               {data.graphData.length}
@@ -125,7 +125,7 @@ const StudentProgress = memo(() => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 sm:p-6 border border-gray-100 dark:border-gray-700 mb-6 sm:mb-8">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 sm:p-6 border border-gray-100 dark:border-gray-700 mb-6 sm:mb-8">
           <h2 className="text-lg sm:text-xl font-bold mb-4 text-gray-900 dark:text-white">Daily Watch Time</h2>
           {data.graphData && data.graphData.length > 0 ? (
             <div className="h-64 sm:h-80">
@@ -193,7 +193,7 @@ const StudentProgress = memo(() => {
           )}
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Watched Videos</h2>
           </div>

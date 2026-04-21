@@ -10,10 +10,12 @@ import {
 import { memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { clearCache, fetchWithCache } from "../lib/apiCache";
+import { CourseCardSkeleton } from "../components/Skeleton";
 
 const Courses = memo(() => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
@@ -35,6 +37,7 @@ const Courses = memo(() => {
     useCache = false,
   ) => {
     setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams();
       params.append("page", pageNum);
@@ -56,6 +59,7 @@ const Courses = memo(() => {
       }
     } catch (err) {
       console.error(err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -197,13 +201,28 @@ const Courses = memo(() => {
 
         {/* Results */}
         {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-100 dark:bg-violet-900/30 mb-4">
-              <div className="w-8 h-8 border-4 border-violet-600 border-t-transparent rounded-full animate-spin" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(15)].map((_, i) => (
+              <CourseCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl shadow-md border border-slate-100 dark:border-slate-700">
+            <div className="w-24 h-24 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl">⚠</span>
             </div>
-            <p className="text-slate-600 dark:text-slate-400 text-lg">
-              Loading courses...
+            <p className="text-red-600 dark:text-red-400 text-xl mb-2">
+              Failed to load courses
             </p>
+            <p className="text-slate-500 dark:text-slate-500 text-base mb-6">
+              {error}
+            </p>
+            <button
+              onClick={() => fetchCourses(page, search, category)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition cursor-pointer"
+            >
+              Try Again
+            </button>
           </div>
         ) : courses.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl shadow-md border border-slate-100 dark:border-slate-700">

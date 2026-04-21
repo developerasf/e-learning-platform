@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, memo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import { BookOpen, User, Clock, Play, CheckCircle, AlertCircle, ArrowRight, FileVideo, GraduationCap } from 'lucide-react';
+import { BookOpen, User, Clock, Play, CheckCircle, AlertCircle, ArrowRight, FileVideo, GraduationCap, ArrowLeft } from 'lucide-react';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const CourseDetail = memo(() => {
   const { id } = useParams();
@@ -150,6 +151,21 @@ const CourseDetail = memo(() => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      {/* Breadcrumbs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <Breadcrumbs items={[
+          { label: 'Courses', link: '/courses' },
+          { label: course?.title || 'Course' }
+        ]} />
+        <Link 
+          to="/courses"
+          className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 text-sm mb-2 transition cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Courses
+        </Link>
+      </div>
+
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-violet-600 to-violet-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">

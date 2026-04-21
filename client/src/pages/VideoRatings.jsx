@@ -95,7 +95,7 @@ const VideoRatings = memo(() => {
               ← Back to all videos
             </button>
             
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 sm:p-6 border border-gray-100 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-6">
                 <div className="flex-1">
                   <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
@@ -140,7 +140,7 @@ const VideoRatings = memo(() => {
             </div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-700/50">

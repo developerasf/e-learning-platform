@@ -71,7 +71,7 @@ const AdminResults = () => {
             placeholder="Search courses..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition"
           />
         </div>
 
@@ -86,7 +86,7 @@ const AdminResults = () => {
               <Link
                 key={course._id}
                 to={`/admin/results/${course._id}`}
-                className="group bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300"
+                className="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300"
               >
                 {course.thumbnail && (
                   <div className="h-36 overflow-hidden">

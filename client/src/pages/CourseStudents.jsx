@@ -88,7 +88,7 @@ const CourseStudents = memo(() => {
       </div>
 
       {showAddForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 sm:p-6 mb-6">
           <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Add Student to Course</h2>
           {availableUsers.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-sm">All students are already enrolled or no students available.</p>
@@ -116,7 +116,7 @@ const CourseStudents = memo(() => {
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden">
         {students.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400 text-sm sm:text-base">No students enrolled yet.</div>
         ) : (

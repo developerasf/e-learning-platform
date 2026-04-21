@@ -1,7 +1,9 @@
 import { useState, useEffect, memo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 import { Save, Plus, Trash2, Upload, FileText, Play, X, ArrowLeft, Loader2, Check, Image, Link2 } from 'lucide-react';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const AdminCourseForm = memo(() => {
   const { id } = useParams();
@@ -26,6 +28,7 @@ const AdminCourseForm = memo(() => {
   const [notesUploading, setNotesUploading] = useState(false);
   const [newNoteTitle, setNewNoteTitle] = useState({});
   const [newNoteUrl, setNewNoteUrl] = useState({});
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
   const getYouTubeTitle = async (url) => {
     const videoId = extractVideoId(url);
@@ -76,7 +79,7 @@ const AdminCourseForm = memo(() => {
 
   const handleUploadNotes = async (chapterId, file) => {
     if (!file || file.type !== 'application/pdf') {
-      alert('Please upload a PDF file');
+      toast.error('Please upload a PDF file');
       return;
     }
     setNotesUploading(true);
@@ -110,7 +113,7 @@ const AdminCourseForm = memo(() => {
   const handleAddGoogleDriveNote = async (chapterId) => {
     const url = newNoteUrl[chapterId]?.trim();
     if (!url || !url.includes('drive.google.com') && !url.includes('docs.google.com')) {
-      alert('Please enter a valid Google Drive link');
+      toast.error('Please enter a valid Google Drive link');
       return;
     }
     setNotesUploading(true);
@@ -142,7 +145,7 @@ const AdminCourseForm = memo(() => {
   }, [id, user, navigate]);
 
   const handleSave = async () => {
-    if (!course.title || !course.description) { alert('Please fill in title and description'); return; }
+    if (!course.title || !course.description) { toast.error('Please fill in title and description'); return; }
     setSaving(true);
     const token = localStorage.getItem('token');
     const url = id ? `/api/courses/${id}` : '/api/courses';
@@ -172,25 +175,33 @@ const AdminCourseForm = memo(() => {
   };
 
   const handleDeleteChapter = async (chapterId) => {
-    if (!confirm('Delete this chapter? This will also delete all videos in this chapter.')) return;
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch(`/api/courses/${id}/chapters/${chapterId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-      if (res.ok) { 
-        const data = await res.json(); 
-        setCourse(data); 
-      } else {
-        const err = await res.json();
-        alert(err.message || 'Failed to delete chapter');
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Chapter',
+      message: 'Delete this chapter? This will also delete all videos in this chapter.',
+      danger: true,
+      onConfirm: async () => {
+        const token = localStorage.getItem('token');
+        try {
+          const res = await fetch(`/api/courses/${id}/chapters/${chapterId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+          if (res.ok) { 
+            const data = await res.json(); 
+            setCourse(data); 
+            toast.success('Chapter deleted successfully');
+          } else {
+            const err = await res.json();
+            toast.error(err.message || 'Failed to delete chapter');
+          }
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to delete chapter');
+        }
       }
-    } catch (error) {
-      console.error(error);
-      alert('Failed to delete chapter');
-    }
+    });
   };
 
   const handleAddVideo = async () => {
-    if (!newVideo.youtubeUrl) { alert('Please enter a YouTube URL'); return; }
+    if (!newVideo.youtubeUrl) { toast.error('Please enter a YouTube URL'); return; }
     const token = localStorage.getItem('token');
     const res = await fetch(`/api/courses/${id}/chapters/${newVideo.chapterId}/videos`, {
       method: 'POST',
@@ -201,31 +212,47 @@ const AdminCourseForm = memo(() => {
   };
 
   const handleDeleteVideo = async (chapterId, videoId) => {
-    if (!confirm('Delete this video?')) return;
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/videos/${videoId}`, { 
-        method: 'DELETE', 
-        headers: { 'Authorization': `Bearer ${token}` } 
-      });
-      if (res.ok) { 
-        const data = await res.json(); 
-        setCourse(data); 
-      } else {
-        const err = await res.json();
-        alert(err.message || 'Failed to delete video');
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Video',
+      message: 'Delete this video?',
+      danger: true,
+      onConfirm: async () => {
+        const token = localStorage.getItem('token');
+        try {
+          const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/videos/${videoId}`, { 
+            method: 'DELETE', 
+            headers: { 'Authorization': `Bearer ${token}` } 
+          });
+          if (res.ok) { 
+            const data = await res.json(); 
+            setCourse(data); 
+            toast.success('Video deleted successfully');
+          } else {
+            const err = await res.json();
+            toast.error(err.message || 'Failed to delete video');
+          }
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to delete video');
+        }
       }
-    } catch (error) {
-      console.error(error);
-      alert('Failed to delete video');
-    }
+    });
   };
 
   const handleDeleteSingleNote = async (chapterId, noteId) => {
-    if (!confirm('Delete this note?')) return;
-    const token = localStorage.getItem('token');
-    const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/notes/${noteId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-    if (res.ok) { const data = await res.json(); setCourse(data); }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Note',
+      message: 'Delete this note?',
+      danger: true,
+      onConfirm: async () => {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`/api/courses/${id}/chapters/${chapterId}/notes/${noteId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        if (res.ok) { const data = await res.json(); setCourse(data); toast.success('Note deleted successfully'); }
+        else { toast.error('Failed to delete note'); }
+      }
+    });
   };
 
   if (loading) {
@@ -469,6 +496,17 @@ const AdminCourseForm = memo(() => {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger={confirmDialog.danger}
+      />
     </div>
   );
 });

@@ -1,12 +1,16 @@
 import { useState, useEffect, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 import { Settings, Users, FileText, Plus, Trash2, Edit, Eye, EyeOff, CheckCircle, Clock, BarChart3, BookOpen, Loader2, CreditCard } from 'lucide-react';
+import ConfirmDialog from '../components/ConfirmDialog';
+import Breadcrumbs from '../components/Breadcrumbs';
 
 const AdminDashboard = memo(() => {
   const [courses, setCourses] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, courseId: null, title: '', message: '' });
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -35,14 +39,28 @@ const AdminDashboard = memo(() => {
       });
   }, [user, navigate]);
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this course?')) return;
+  const handleDelete = (id) => {
+    setConfirmDialog({
+      isOpen: true,
+      courseId: id,
+      title: 'Delete Course',
+      message: 'Are you sure you want to delete this course? This action cannot be undone.'
+    });
+  };
+
+  const confirmDelete = async () => {
+    const id = confirmDialog.courseId;
     const token = localStorage.getItem('token');
-    await fetch(`/api/courses/${id}`, {
+    const res = await fetch(`/api/courses/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    setCourses(courses.filter(c => c._id !== id));
+    if (res.ok) {
+      setCourses(courses.filter(c => c._id !== id));
+      toast.success('Course deleted successfully');
+    } else {
+      toast.error('Failed to delete course');
+    }
   };
 
   const togglePublish = async (id, currentStatus) => {
@@ -57,6 +75,9 @@ const AdminDashboard = memo(() => {
     });
     if (res.ok) {
       setCourses(courses.map(c => c._id === id ? { ...c, isPublished: !currentStatus } : c));
+      toast.success(currentStatus ? 'Course unpublished successfully' : 'Course published successfully');
+    } else {
+      toast.error('Failed to update course status');
     }
   };
 
@@ -76,6 +97,11 @@ const AdminDashboard = memo(() => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-12 sm:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs items={[
+          { label: 'Admin' }
+        ]} />
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
           <div>
@@ -266,6 +292,17 @@ const AdminDashboard = memo(() => {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+        onConfirm={confirmDelete}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger={true}
+      />
     </div>
   );
 });

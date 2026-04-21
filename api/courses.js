@@ -5,30 +5,7 @@ import Attendance from './_models/Attendance.js';
 import Result from './_models/Result.js';
 import { protect, admin } from './_middleware/auth.js';
 import connectDB from './_lib/db.js';
-
-const sanitizeInput = (input) => {
-  if (typeof input === 'string') {
-    return input.trim().substring(0, 500);
-  }
-  return input;
-};
-
-const extractYouTubeId = (url) => {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
-};
-
-const getPath = (url) => {
-  if (!url) return '/';
-  let path = url.split('?')[0];
-  if (path.startsWith('/api/courses')) {
-    path = path.substring(12);
-  } else if (path.startsWith('/api')) {
-    path = path.substring(4);
-  }
-  return path || '/';
-};
+import { getPath, sanitizeInput, extractYouTubeId } from './_lib/utils.js';
 
 export default async function handler(req, res) {
   try {
@@ -560,6 +537,10 @@ export default async function handler(req, res) {
     
     const { title, order } = req.body;
     
+    if (!title || title.trim() === '') {
+      return res.status(400).json({ message: 'Chapter title is required' });
+    }
+    
     const course = await Course.findById(courseId);
     
     if (!course) {
@@ -652,6 +633,10 @@ export default async function handler(req, res) {
     if (adminError) return adminError;
     
     const { title, youtubeUrl, duration } = req.body;
+    
+    if (!title || title.trim() === '') {
+      return res.status(400).json({ message: 'Video title is required' });
+    }
     
     const course = await Course.findById(courseId);
     
@@ -1146,6 +1131,11 @@ export default async function handler(req, res) {
     }
 
     const targetDate = new Date(date + 'T00:00:00.000Z');
+
+    const invalidRecords = records.filter(r => !r.studentId);
+    if (invalidRecords.length > 0) {
+      return res.status(400).json({ message: 'All records must have a valid studentId' });
+    }
 
     const bulkOps = records.map(record => ({
       updateOne: {

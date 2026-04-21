@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import connectDB from '../_lib/db.js';
 import { admin, protect } from '../_middleware/auth.js';
 import User from '../_models/User.js';
+import { getPath, sanitizeInput } from '../_lib/utils.js';
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -38,13 +39,6 @@ const validateEmail = (email) => {
   return emailRegex.test(email);
 };
 
-const sanitizeInput = (input) => {
-  if (typeof input === 'string') {
-    return input.trim().substring(0, 500);
-  }
-  return input;
-};
-
 const validatePassword = (password) => {
   if (password.length < 6) {
     return { valid: false, message: 'Password must be at least 6 characters' };
@@ -68,18 +62,6 @@ const sendEmail = async (to, subject, html) => {
     subject,
     html
   });
-};
-
-const getPath = (url) => {
-  if (!url) return '/';
-  let path = url.split('?')[0];
-  // For /api/auth/* routes, strip both /api and /auth
-  if (path.startsWith('/api/auth')) {
-    path = path.substring(9); // Remove '/api/auth'
-  } else if (path.startsWith('/api')) {
-    path = path.substring(4); // Remove '/api'
-  }
-  return path || '/';
 };
 
 export default async function handler(req, res) {

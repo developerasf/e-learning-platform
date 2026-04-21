@@ -2,15 +2,7 @@ import User from './_models/User.js';
 import Payment from './_models/Payment.js';
 import { protect, admin } from './_middleware/auth.js';
 import connectDB from './_lib/db.js';
-
-const getPath = (url) => {
-  if (!url) return '/';
-  let path = url.split('?')[0];
-  if (path.startsWith('/api/payments')) {
-    path = path.substring(13);
-  }
-  return path || '/';
-};
+import { getPath } from './_lib/utils.js';
 
 export default async function handler(req, res) {
   try {
