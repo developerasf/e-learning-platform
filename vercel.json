@@ -16,6 +16,8 @@
     { "source": "/api/courses/(.*)", "destination": "/api/courses.js" },
     { "source": "/api/upload", "destination": "/api/upload.js" },
     { "source": "/api/upload/(.*)", "destination": "/api/upload.js" },
+    { "source": "/api/payments", "destination": "/api/payments.js" },
+    { "source": "/api/payments/(.*)", "destination": "/api/payments.js" },
     { "source": "/:path*", "destination": "/index.html" }
   ]
 }
