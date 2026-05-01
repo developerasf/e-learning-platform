@@ -91,7 +91,7 @@ A full-stack online learning platform built with MERN stack (MongoDB, Express, R
 
 The project is configured for Vercel deployment. Push to GitHub and connect to Vercel for automatic deployments.
 
-Live demo: https://bipulvai.vercel.app
+Live demo: https://bipulsclassroom.com
 
 ## License
 
