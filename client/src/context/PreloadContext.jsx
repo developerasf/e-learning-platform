@@ -34,12 +34,25 @@ export const PreloadProvider = ({ children }) => {
         return r.json();
       })
       .then((data) => {
-        const courses = data.courses || data;
-        localStorage.setItem(
-          'preloadedCourses',
-          JSON.stringify({ data: courses, timestamp: Date.now() })
-        );
-        setPreloadedCourses(courses);
+        // Only set courses if we get a valid array response
+        if (data && Array.isArray(data.courses)) {
+          const courses = data.courses;
+          localStorage.setItem(
+            'preloadedCourses',
+            JSON.stringify({ data: courses, timestamp: Date.now() })
+          );
+          setPreloadedCourses(courses);
+        } else if (Array.isArray(data)) {
+          // Fallback: data itself might be an array (older API format)
+          localStorage.setItem(
+            'preloadedCourses',
+            JSON.stringify({ data, timestamp: Date.now() })
+          );
+          setPreloadedCourses(data);
+        } else {
+          // API returned error or non-array - don't cache it
+          console.error('Invalid courses response:', data);
+        }
       })
       .catch(console.error)
       .finally(() => setPreloading(false));

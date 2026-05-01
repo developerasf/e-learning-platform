@@ -16,7 +16,7 @@ import { usePreload } from "../context/PreloadContext";
 const Courses = memo(() => {
   const { preloadedCourses, preloading } = usePreload();
 
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState(null); // null indicates not yet loaded
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
@@ -77,11 +77,18 @@ const Courses = memo(() => {
         ? await fetchWithCache(url)
         : await fetch(url).then((r) => r.json());
 
-      if (data.courses) {
+      // Validate response before setting
+      if (data && Array.isArray(data.courses)) {
         setCourses(data.courses);
         setPagination(data.pagination);
-      } else {
+      } else if (Array.isArray(data)) {
+        // Fallback for older API format
         setCourses(data);
+        setPagination(null);
+      } else {
+        // Invalid response (error object) - treat as empty
+        console.error('Invalid courses response:', data);
+        setCourses([]);
       }
     } catch (err) {
       console.error(err);
@@ -246,7 +253,7 @@ const Courses = memo(() => {
               Try Again
             </button>
           </div>
-        ) : courses.length === 0 ? (
+        ) : !Array.isArray(courses) || courses.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl shadow-md border border-slate-100 dark:border-slate-700">
             <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-6">
               <BookOpen className="w-12 h-12 text-slate-400" />
@@ -271,7 +278,7 @@ const Courses = memo(() => {
               <p className="text-slate-600 dark:text-slate-400">
                 Showing{" "}
                 <span className="font-semibold text-slate-900 dark:text-white">
-                  {courses.length}
+                  {Array.isArray(courses) ? courses.length : 0}
                 </span>{" "}
                 courses
                 {pagination && pagination.total > 0 && (
@@ -282,7 +289,7 @@ const Courses = memo(() => {
 
             {/* Course Grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course) => (
+              {Array.isArray(courses) && courses.map((course) => (
                 <Link
                   key={course._id}
                   to={`/courses/${course._id}`}
