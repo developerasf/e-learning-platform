@@ -7,12 +7,15 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { clearCache, fetchWithCache } from "../lib/apiCache";
+import { clearCachePattern, fetchWithCache } from "../lib/apiCache";
 import { CourseCardSkeleton } from "../components/Skeleton";
+import { usePreload } from "../context/PreloadContext";
 
 const Courses = memo(() => {
+  const { preloadedCourses, preloading } = usePreload();
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,8 +23,11 @@ const Courses = memo(() => {
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [banner, setBanner] = useState("");
+
+  // Track whether we've already seeded from preload so we don't overwrite
+  // the preloaded data with a redundant fetch on first render.
+  const seededFromPreload = useRef(false);
 
   useEffect(() => {
     fetch("/api/upload/banner")
@@ -29,6 +35,26 @@ const Courses = memo(() => {
       .then((data) => data.url && setBanner(data.url))
       .catch(console.error);
   }, []);
+
+  // Seed from PreloadContext on first render (page=1, no filters) — instant display
+  useEffect(() => {
+    if (seededFromPreload.current) return;
+    if (page !== 1 || search || category) return;
+
+    if (preloadedCourses && preloadedCourses.length > 0) {
+      setCourses(preloadedCourses);
+      setLoading(false);
+      seededFromPreload.current = true;
+      return;
+    }
+
+    if (!preloading) {
+      // PreloadContext finished but had no data — fall through to fetchCourses
+      fetchCourses(1, "", "", true);
+      seededFromPreload.current = true;
+    }
+    // else: still preloading — wait for next effect run
+  }, [preloadedCourses, preloading]);
 
   const fetchCourses = async (
     pageNum = 1,
@@ -46,10 +72,10 @@ const Courses = memo(() => {
       if (cat) params.append("category", cat);
 
       const url = `/api/courses?${params}`;
-      const data =
-        useCache && pageNum === 1
-          ? await fetchWithCache(url)
-          : await fetch(url).then((r) => r.json());
+      // fetchWithCache auto-applies 3-min TTL for course list URLs
+      const data = useCache
+        ? await fetchWithCache(url)
+        : await fetch(url).then((r) => r.json());
 
       if (data.courses) {
         setCourses(data.courses);
@@ -65,21 +91,24 @@ const Courses = memo(() => {
     }
   };
 
+  // Fetch when page changes (page 1 with no filters is already seeded from preload)
   useEffect(() => {
-    fetchCourses(page, "", "", page === 1);
-  }, [page]);
+    // Skip the initial mount — preload effect handles that
+    if (page === 1 && !search && !category) return;
+    fetchCourses(page, search, category, page === 1);
+  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    clearCache();
+    clearCachePattern("/api/courses?");
     fetchCourses(1, search, category, false);
   };
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
     setPage(1);
-    clearCache();
+    clearCachePattern("/api/courses?");
     fetchCourses(1, search, e.target.value, false);
   };
 
@@ -87,7 +116,7 @@ const Courses = memo(() => {
     setSearch("");
     setCategory("");
     setPage(1);
-    clearCache();
+    clearCachePattern("/api/courses?");
     fetchCourses(1, "", "", false);
   };
 
@@ -191,13 +220,6 @@ const Courses = memo(() => {
             </div>
           )}
         </form>
-
-        {/* Banner Section */}
-        {/*banner && (
-          <div className="mb-12 w-full aspect-video sm:aspect-[16/9] rounded-2xl overflow-hidden shadow-xl border border-slate-100 dark:border-slate-800">
-            <img src={banner} alt="Banner" className="w-full h-full object-cover" />
-          </div>
-        ) */}
 
         {/* Results */}
         {loading ? (

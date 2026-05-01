@@ -27,9 +27,9 @@ const otpLimiter = rateLimit({
   legacyHeaders: false
 });
 
-const generateToken = (id) => {
+const generateToken = (id, role, name, email) => {
   const secret = process.env.JWT_SECRET || 'default-secret-key';
-  return jwt.sign({ id }, secret, {
+  return jwt.sign({ id, role, name, email }, secret, {
     expiresIn: '30d'
   });
 };
@@ -121,7 +121,7 @@ export default async function handler(req, res) {
           name: user.name,
           email: user.email,
           role: user.role,
-          token: generateToken(user._id)
+          token: generateToken(user._id, user.role, user.name, user.email)
         });
       }
     }
@@ -148,7 +148,7 @@ export default async function handler(req, res) {
           role: user.role,
           enrolledCourses: user.enrolledCourses,
           isVerified: user.isVerified,
-          token: generateToken(user._id)
+          token: generateToken(user._id, user.role, user.name, user.email)
         });
       } else {
         return res.status(401).json({ message: 'Invalid email or password' });
@@ -271,7 +271,7 @@ export default async function handler(req, res) {
           email: user.email,
           role: user.role,
           isVerified: true,
-          token: generateToken(user._id)
+          token: generateToken(user._id, user.role, user.name, user.email)
         });
       }
     }
@@ -463,7 +463,7 @@ export default async function handler(req, res) {
         email: user.email,
         role: user.role,
         isVerified: user.isVerified,
-        token: generateToken(user._id)
+        token: generateToken(user._id, user.role, user.name, user.email)
       });
     }
 
@@ -471,8 +471,15 @@ export default async function handler(req, res) {
       const authError = await protect(req, res);
       if (authError) return authError;
 
-      const user = await User.findById(req.user._id).select('-password');
-      return res.json(user);
+      // Return JWT payload data — no DB hit needed for basic identity check.
+      // If full profile is needed, use GET /api/users/profile instead.
+      return res.json({
+        _id: req.user._id,
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+      });
     }
 
     if (method === 'GET' && path === '/users') {

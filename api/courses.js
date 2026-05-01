@@ -3,7 +3,7 @@ import User from './_models/User.js';
 import Enrollment from './_models/Enrollment.js';
 import Attendance from './_models/Attendance.js';
 import Result from './_models/Result.js';
-import { protect, admin } from './_middleware/auth.js';
+import { protect, protectFull, admin } from './_middleware/auth.js';
 import connectDB from './_lib/db.js';
 import { getPath, sanitizeInput, extractYouTubeId } from './_lib/utils.js';
 import { cache } from './_lib/redis.js';
@@ -76,9 +76,13 @@ export default async function handler(req, res) {
       }
     };
 
-    // Cache for 5 minutes
+    // Cache for 5 minutes in Redis
     await cache.set(cacheKey, result, 300);
 
+    // Also tell Vercel's CDN edge to cache for 60s (stale-while-revalidate 30s)
+    // This means the very first hit after a cold start is served from the edge,
+    // not from the serverless function at all.
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
     return res.json(result);
   }
 
@@ -120,10 +124,11 @@ export default async function handler(req, res) {
 
   // GET /api/courses/my-courses
   if (method === 'GET' && path === '/my-courses') {
-    const authError = await protect(req, res);
+    // protectFull fetches the full user doc (needed for legacy enrolledCourses field)
+    const authError = await protectFull(req, res);
     if (authError) return authError;
     
-    const user = await User.findById(req.user._id);
+    const user = req.user; // already the full user doc from protectFull
     let courses = [];
     
     if (!user) return res.json([]);
@@ -262,16 +267,14 @@ export default async function handler(req, res) {
     const courseId = enrollmentStatusMatch[1];
     const authError = await protect(req, res);
     if (authError) return authError;
-    
-    const user = await User.findById(req.user._id);
-    const course = await Course.findById(courseId);
-    
+
+    // req.user.role comes from JWT — no extra DB fetch needed
     let enrollment = await Enrollment.findOne({
       student: req.user._id,
       course: courseId
     });
-    
-    if (!enrollment && user.role === 'admin') {
+
+    if (!enrollment && req.user.role === 'admin') {
       enrollment = await Enrollment.create({
         student: req.user._id,
         course: courseId,
@@ -279,11 +282,11 @@ export default async function handler(req, res) {
       });
       return res.json({ status: 'approved' });
     }
-    
+
     if (!enrollment) {
       return res.json({ status: 'not_enrolled' });
     }
-    
+
     return res.json({ status: enrollment.status });
   }
 
@@ -293,10 +296,14 @@ export default async function handler(req, res) {
     const authError = await protect(req, res);
     if (authError) return authError;
     
-    const user = await User.findById(req.user._id);
-    if (!user.isVerified) {
+    // isVerified check: fetch only the isVerified field to avoid full User doc
+    const userVerified = await User.findById(req.user._id).select('isVerified');
+    if (!userVerified || !userVerified.isVerified) {
       return res.status(403).json({ message: 'Please verify your email before enrolling' });
     }
+
+    // req.user.role comes from JWT — no extra DB fetch needed
+    const role = req.user.role;
     
     const course = await Course.findById(courseId);
     if (!course) {
@@ -314,7 +321,7 @@ export default async function handler(req, res) {
       if (existingEnrollment.status === 'approved') {
         return res.status(400).json({ message: 'Already enrolled' });
       } else if (existingEnrollment.status === 'pending') {
-        if (user.role === 'admin') {
+        if (role === 'admin') {
           existingEnrollment.status = 'approved';
           await existingEnrollment.save();
           enrollmentChanged = true;
@@ -322,7 +329,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ message: 'Enrollment request already pending' });
         }
       } else if (existingEnrollment.status === 'rejected') {
-        if (user.role === 'admin') {
+        if (role === 'admin') {
           existingEnrollment.status = 'approved';
           await existingEnrollment.save();
           enrollmentChanged = true;
@@ -333,7 +340,7 @@ export default async function handler(req, res) {
         }
       }
     } else {
-      if (user.role === 'admin') {
+      if (role === 'admin') {
         await Enrollment.create({
           student: req.user._id,
           course: courseId,
@@ -355,7 +362,7 @@ export default async function handler(req, res) {
       await cache.delByPattern('courses:*');
     }
     
-    const message = user.role === 'admin' || (existingEnrollment && existingEnrollment.status === 'rejected')
+    const message = role === 'admin' || (existingEnrollment && existingEnrollment.status === 'rejected')
       ? 'Enrolled successfully'
       : 'Enrollment request sent. Waiting for admin approval.';
     
@@ -451,13 +458,24 @@ export default async function handler(req, res) {
     
     // GET /api/courses/:id
     if (method === 'GET') {
+      // Cache course detail for 5 minutes (invalidated on PUT/DELETE)
+      const cacheKey = `course:detail:${courseId}`;
+      const cached = await cache.get(cacheKey);
+      if (cached) {
+        res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
+        return res.json(cached);
+      }
+
       const course = await Course.findById(courseId)
-        .populate('createdBy', 'name');
+        .populate('createdBy', 'name')
+        .lean();
       
       if (!course) {
         return res.status(404).json({ message: 'Course not found' });
       }
-      
+
+      await cache.set(cacheKey, course, 300);
+      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
       return res.json(course);
     }
 
@@ -465,6 +483,8 @@ export default async function handler(req, res) {
     if (method === 'PUT') {
       const authError = await protect(req, res);
       if (authError) return authError;
+      // Invalidate course detail cache on update
+      await cache.del(`course:detail:${courseId}`);
       
       const adminError = admin(req, res);
       if (adminError) return adminError;
@@ -518,8 +538,9 @@ export default async function handler(req, res) {
       await Enrollment.deleteMany({ course: courseId });
       await course.deleteOne();
       
-      // Invalidate courses cache
+      // Invalidate all related caches
       await cache.delByPattern('courses:*');
+      await cache.del(`course:detail:${courseId}`);
       
       return res.json({ message: 'Course deleted' });
     }
@@ -930,7 +951,7 @@ export default async function handler(req, res) {
     const authError = await protect(req, res);
     if (authError) return authError;
 
-    const user = await User.findById(req.user._id);
+    // req.user.role comes from JWT — no extra DB fetch needed
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
@@ -942,7 +963,7 @@ export default async function handler(req, res) {
       status: 'approved'
     });
 
-    if (!enrollment && user.role === 'admin') {
+    if (!enrollment && req.user.role === 'admin') {
       enrollment = await Enrollment.create({
         student: req.user._id,
         course: courseId,

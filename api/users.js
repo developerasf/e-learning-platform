@@ -4,7 +4,7 @@ import Enrollment from './_models/Enrollment.js';
 import Attendance from './_models/Attendance.js';
 import Result from './_models/Result.js';
 import Payment from './_models/Payment.js';
-import { protect, admin } from './_middleware/auth.js';
+import { protect, protectFull, admin } from './_middleware/auth.js';
 import connectDB from './_lib/db.js';
 import { getPath } from './_lib/utils.js';
 import { cache } from './_lib/redis.js';

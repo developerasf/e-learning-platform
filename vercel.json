@@ -3,21 +3,29 @@
   "outputDirectory": "client/dist",
   "framework": "vite",
   "installCommand": "npm install && cd client && npm install",
+  "functions": {
+    "api/courses.js":    { "maxDuration": 15, "memory": 512 },
+    "api/users.js":      { "maxDuration": 15, "memory": 512 },
+    "api/auth/index.js": { "maxDuration": 10, "memory": 256 },
+    "api/payments.js":   { "maxDuration": 10, "memory": 256 },
+    "api/upload.js":     { "maxDuration": 30, "memory": 512 },
+    "api/health.js":     { "maxDuration": 5,  "memory": 128 }
+  },
   "rewrites": [
-    { "source": "/api/health", "destination": "/api/health.js" },
-    { "source": "/api/health/(.*)", "destination": "/api/health.js" },
-    { "source": "/api/sitemap.xml", "destination": "/api/sitemap.js" },
-    { "source": "/sitemap.xml", "destination": "/api/sitemap.js" },
-    { "source": "/api/auth", "destination": "/api/auth/index.js" },
-    { "source": "/api/auth/(.*)", "destination": "/api/auth/index.js" },
-    { "source": "/api/users", "destination": "/api/users.js" },
-    { "source": "/api/users/(.*)", "destination": "/api/users.js" },
-    { "source": "/api/courses", "destination": "/api/courses.js" },
+    { "source": "/api/health",       "destination": "/api/health.js" },
+    { "source": "/api/health/(.*)",  "destination": "/api/health.js" },
+    { "source": "/api/sitemap.xml",  "destination": "/api/sitemap.js" },
+    { "source": "/sitemap.xml",      "destination": "/api/sitemap.js" },
+    { "source": "/api/auth",         "destination": "/api/auth/index.js" },
+    { "source": "/api/auth/(.*)",    "destination": "/api/auth/index.js" },
+    { "source": "/api/users",        "destination": "/api/users.js" },
+    { "source": "/api/users/(.*)",   "destination": "/api/users.js" },
+    { "source": "/api/courses",      "destination": "/api/courses.js" },
     { "source": "/api/courses/(.*)", "destination": "/api/courses.js" },
-    { "source": "/api/upload", "destination": "/api/upload.js" },
-    { "source": "/api/upload/(.*)", "destination": "/api/upload.js" },
-    { "source": "/api/payments", "destination": "/api/payments.js" },
+    { "source": "/api/upload",       "destination": "/api/upload.js" },
+    { "source": "/api/upload/(.*)",  "destination": "/api/upload.js" },
+    { "source": "/api/payments",     "destination": "/api/payments.js" },
     { "source": "/api/payments/(.*)", "destination": "/api/payments.js" },
-    { "source": "/:path*", "destination": "/index.html" }
+    { "source": "/:path*",           "destination": "/index.html" }
   ]
 }

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { BookOpen, User, Clock, Play, CheckCircle, AlertCircle, ArrowRight, FileVideo, GraduationCap, ArrowLeft } from 'lucide-react';
 import Breadcrumbs from '../components/Breadcrumbs';
+import { fetchWithCache, clearCache } from '../lib/apiCache';
 
 const CourseDetail = memo(() => {
   const { id } = useParams();
@@ -17,8 +18,8 @@ const CourseDetail = memo(() => {
   const [expandedChapters, setExpandedChapters] = useState({});
 
   useEffect(() => {
-    fetch(`/api/courses/${id}`)
-      .then(res => res.json())
+    // fetchWithCache applies a 5-min TTL for course detail URLs
+    fetchWithCache(`/api/courses/${id}`)
       .then(data => {
         setCourse(data);
         setLoading(false);
@@ -97,6 +98,7 @@ const CourseDetail = memo(() => {
     if (res.ok) {
       toast.success(data.message);
       setEnrollmentStatus('pending');
+      clearCache(`/api/courses/${id}`); // bust 5-min detail cache after enroll
       refreshUser();
     } else {
       if (data.message === 'Already enrolled') {
